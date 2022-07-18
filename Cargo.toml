@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "packages/drawpanel",
   "packages/drawpanel-core",
   "packages/drawpanel-bind-fltk",
   "packages/drawpanel-bind-web"
