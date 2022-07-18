@@ -1,8 +1,15 @@
 [package]
 name = "drawpanel-bind-web"
-version = "0.1.0"
+version = "0.0.0"
 edition = "2021"
-
+description = "Drawpanel web binder"
+publish = true
+license = "MIT"
+readme = "readme.md"
+homepage = "https://github.com/drawpanel/drawpanel"
+repository = "https://github.com/drawpanel/drawpanel.git"
+keywords = ["drawpanel", "drawpanel-bind"]
+categories = ["drawpanel", "drawpanel-bind"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

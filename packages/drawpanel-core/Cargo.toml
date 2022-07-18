@@ -1,8 +1,15 @@
 [package]
 name = "drawpanel-core"
-version = "0.1.0"
+version = "0.0.0"
 edition = "2021"
-
+description = "Drawpanel core"
+publish = true
+license = "MIT"
+readme = "readme.md"
+homepage = "https://github.com/drawpanel/drawpanel"
+repository = "https://github.com/drawpanel/drawpanel.git"
+keywords = ["drawpanel", "draw"]
+categories = ["drawpanel", "draw"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
