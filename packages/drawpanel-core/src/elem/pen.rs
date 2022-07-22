@@ -35,7 +35,7 @@ impl Elem for Pen {
                             line_color,
                         });
                         draw.draw_circle(DrawCircleOpts {
-                            center_coord: *coord,
+                            center_coord: *prev,
                             r: 2.,
                             line_size: 0,
                             line_color,
@@ -55,8 +55,8 @@ impl Elem for Pen {
                             line_color,
                         });
                         draw.draw_circle(DrawCircleOpts {
-                            center_coord: *coord,
-                            r: 3.,
+                            center_coord: *prev,
+                            r: 4.,
                             line_size: 0,
                             line_color,
                             fill_color: line_color,
@@ -72,7 +72,7 @@ impl Elem for Pen {
                 // });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *self.coords.last().unwrap(),
-                    r: 5.,
+                    r: 8.,
                     line_size: 1,
                     line_color: 0,
                     fill_color: 0,
@@ -106,7 +106,7 @@ impl Elem for Pen {
                 // });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *self.coords.last().unwrap(),
-                    r: if darg_point_index == 1 { 6. } else { 5. },
+                    r: 8.,
                     line_size: 1,
                     line_color: 0,
                     fill_color: 0,
