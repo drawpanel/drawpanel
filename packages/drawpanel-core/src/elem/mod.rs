@@ -1,7 +1,6 @@
 pub mod line;
+pub mod pen;
 pub mod rect;
-
-use std::rc::Rc;
 
 use geo::{Coordinate, Point};
 
