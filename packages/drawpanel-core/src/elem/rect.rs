@@ -77,7 +77,7 @@ impl Elem for Rect {
                     left_top_coord: self.lt_coord,
                     width: self.width,
                     height: self.height,
-                    line_size: 5,
+                    line_size: 3,
                     line_color: line_color,
                     fill_color: 0,
                 });
@@ -110,15 +110,6 @@ impl Elem for Rect {
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *bl,
                     r: 5.,
-                    line_size: 0,
-                    line_color,
-                    fill_color: 0,
-                });
-
-                let active = drag_coords.get(index as usize).unwrap();
-                draw.draw_circle(DrawCircleOpts {
-                    center_coord: *active,
-                    r: 6.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
