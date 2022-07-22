@@ -120,7 +120,7 @@ impl Drawpanel {
     }
 
     pub fn append(&mut self, elem: impl Elem + 'static) {
-        self.set_status(Mode::Creating);
+        self.set_mode(Mode::Creating);
         self.elems.push(Box::new(elem));
     }
 
@@ -128,7 +128,7 @@ impl Drawpanel {
         &self.elems
     }
 
-    pub fn set_status(&mut self, mode: Mode) {
+    pub fn set_mode(&mut self, mode: Mode) {
         *self.mode.borrow_mut() = mode;
     }
 }
