@@ -11,6 +11,7 @@ use crate::{
     elem::{Elem, Status},
 };
 
+#[derive(Debug, Clone, Copy)]
 pub enum Mode {
     EditMoving, // default
     Creating,
@@ -130,5 +131,9 @@ impl Drawpanel {
 
     pub fn set_mode(&mut self, mode: Mode) {
         *self.mode.borrow_mut() = mode;
+    }
+
+    pub fn get_mode(&self) -> Mode {
+        self.mode
     }
 }
