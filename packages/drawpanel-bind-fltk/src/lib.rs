@@ -103,14 +103,15 @@ impl Draw for FltkDraw {
 
     fn draw_circle(&self, opts: DrawCircleOpts) {
         draw::set_draw_color(Color::from_hex(opts.line_color));
-        let size = (opts.r * 2) as i32;
+        draw::set_line_style(LineStyle::Solid, opts.line_size as i32);
+        let size = (opts.r * 2.) as i32;
         draw::draw_box(
-            FrameType::OvalBox,
-            (opts.center_coord.x - (opts.r as f64)) as i32,
-            (opts.center_coord.y - (opts.r as f64)) as i32,
-            size,
-            size,
-            Color::Red,
+            FrameType::OFlatFrame,
+            (opts.center_coord.x - opts.r) as i32 + 1,
+            (opts.center_coord.y - opts.r) as i32 + 1,
+            size - 1,
+            size - 1,
+            Color::from_hex(opts.fill_color),
         );
     }
 }
