@@ -71,7 +71,7 @@ impl Elem for Pen {
                         draw.draw_line(DrawLineOpts {
                             from_coord: *prev,
                             end_coord: *coord,
-                            line_size: 10,
+                            line_size: 5,
                             line_color,
                         });
                     }
@@ -102,7 +102,11 @@ impl Elem for Pen {
         if self.coords.len() == 1 {
             (*self.coords.get_mut(0).unwrap()) = from_coord;
         }
-        self.coords.push(end_coord);
+        let last = self.coords.last().unwrap();
+        if Point::new(last.x, last.y).euclidean_distance(&Point::new(end_coord.x, end_coord.y)) > 3.
+        {
+            self.coords.push(end_coord);
+        }
         // self.last_coord = Some(end_coord);
     }
 
