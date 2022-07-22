@@ -13,3 +13,6 @@ categories = ["drawpanel", "drawpanel-bind"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+drawpanel-core = { path = "../drawpanel-core" }
+fltk = { git = "https://github.com/fltk-rs/fltk-rs" }
+geo = {version = "0.22.1" }
