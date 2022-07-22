@@ -78,14 +78,26 @@ impl Drawpanel {
             EventType::Push => {
                 self.prev_coord = mouse_coord;
                 let idx = *hover_index.borrow_mut();
-                let elem = elems.get_mut(idx as usize);
-                if let Some(elem) = elem {
-                    let vertex = elem.get_vertex();
-                    for (i, coord) in vertex.iter().enumerate() {
-                        let point = Point::new(coord.x, coord.y);
-                        if mouse_point.euclidean_distance(&point) < 10. {
-                            self.mode = Mode::EditResizing(i as u8);
-                            *drag_vertex.borrow_mut() = i as i32;
+
+                match self.mode {
+                    Mode::EditMoving => {
+                        let elem = elems.get_mut(idx as usize);
+                        if let Some(elem) = elem {
+                            let vertex = elem.get_vertex();
+                            for (i, coord) in vertex.iter().enumerate() {
+                                let point = Point::new(coord.x, coord.y);
+                                if mouse_point.euclidean_distance(&point) < 10. {
+                                    self.mode = Mode::EditResizing(i as u8);
+                                    *drag_vertex.borrow_mut() = i as i32;
+                                }
+                            }
+                        }
+                    }
+                    Mode::Creating => {}
+                    Mode::EditResizing(_) => {}
+                    Mode::Deleting => {
+                        if idx > -1 {
+                            elems.remove(idx as usize);
                         }
                     }
                 }
