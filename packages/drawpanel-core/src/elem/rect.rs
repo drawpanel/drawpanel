@@ -45,28 +45,28 @@ impl Elem for Rect {
                 let bl = drag_coords.get(3).unwrap();
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *lt,
-                    r: 5,
+                    r: 5.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *tr,
-                    r: 5,
+                    r: 5.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *br,
-                    r: 5,
+                    r: 5.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *bl,
-                    r: 5,
+                    r: 5.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
@@ -88,28 +88,28 @@ impl Elem for Rect {
                 let bl = drag_coords.get(3).unwrap();
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *lt,
-                    r: 5,
+                    r: 5.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *tr,
-                    r: 5,
+                    r: 5.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *br,
-                    r: 5,
+                    r: 5.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *bl,
-                    r: 5,
+                    r: 5.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
@@ -118,7 +118,7 @@ impl Elem for Rect {
                 let active = drag_coords.get(index as usize).unwrap();
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *active,
-                    r: 6,
+                    r: 6.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,

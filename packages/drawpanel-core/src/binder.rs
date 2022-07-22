@@ -29,7 +29,7 @@ pub struct DrawRectOpts {
 
 pub struct DrawCircleOpts {
     pub center_coord: Coordinate,
-    pub r: u32,
+    pub r: f64,
     pub line_size: u32,
     pub line_color: u32,
     pub fill_color: u32,
