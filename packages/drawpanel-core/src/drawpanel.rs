@@ -14,7 +14,7 @@ use crate::{
 #[derive(Debug, Clone, Copy)]
 pub enum Mode {
     EditMoving, // default
-    Creating,
+    Creating(Box<dyn Elem>),
     EditResizing(u8),
     Deleting,
 }
@@ -93,7 +93,9 @@ impl Drawpanel {
                             }
                         }
                     }
-                    Mode::Creating => {}
+                    Mode::Creating(elem) => {
+                        self.elems.push(elem);
+                    }
                     Mode::EditResizing(_) => {}
                     Mode::Deleting => {
                         if idx > -1 {
@@ -106,7 +108,7 @@ impl Drawpanel {
                 self.mode = Mode::EditMoving;
             }
             EventType::Drag => match self.mode {
-                Mode::Creating => {
+                Mode::Creating(_) => {
                     let top = elems.last_mut();
                     if let Some(elem) = top {
                         elem.creating(self.prev_coord, mouse_coord);
@@ -133,7 +135,6 @@ impl Drawpanel {
     }
 
     pub fn append(&mut self, elem: impl Elem + 'static) {
-        self.set_mode(Mode::Creating);
         self.elems.push(Box::new(elem));
     }
 
@@ -145,7 +146,7 @@ impl Drawpanel {
         *self.mode.borrow_mut() = mode;
     }
 
-    pub fn get_mode(&self) -> Mode {
-        self.mode
+    pub fn get_mode(&self) -> &Mode {
+        &self.mode
     }
 }
