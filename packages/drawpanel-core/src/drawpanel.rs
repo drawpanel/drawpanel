@@ -11,10 +11,10 @@ use crate::{
     elem::{Elem, Status},
 };
 
-#[derive(Debug, Clone, Copy)]
+// #[derive(Debug, Clone, Copy)]
 pub enum Mode {
     EditMoving, // default
-    Creating(Box<dyn Elem>),
+    Creating(Option<Box<dyn Elem>>),
     EditResizing(u8),
     Deleting,
 }
@@ -79,7 +79,7 @@ impl Drawpanel {
                 self.prev_coord = mouse_coord;
                 let idx = *hover_index.borrow_mut();
 
-                match self.mode {
+                match self.mode.borrow_mut() {
                     Mode::EditMoving => {
                         let elem = elems.get_mut(idx as usize);
                         if let Some(elem) = elem {
@@ -94,7 +94,9 @@ impl Drawpanel {
                         }
                     }
                     Mode::Creating(elem) => {
-                        self.elems.push(elem);
+                        if let Some(elem) = elem.take() {
+                            self.elems.push(elem);
+                        }
                     }
                     Mode::EditResizing(_) => {}
                     Mode::Deleting => {

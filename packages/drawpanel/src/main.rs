@@ -71,21 +71,27 @@ impl AppView {
         pen_btn.set_callback({
             let drawpanel = Rc::clone(&drawpanel);
             move |btn| {
-                (*drawpanel).borrow_mut().draw_elem(Pen::default());
+                (*drawpanel)
+                    .borrow_mut()
+                    .set_mode(Mode::Creating(Some(Box::new(Pen::default()))));
             }
         });
 
         line_btn.set_callback({
             let drawpanel = Rc::clone(&drawpanel);
             move |btn| {
-                (*drawpanel).borrow_mut().draw_elem(Line::default());
+                (*drawpanel)
+                    .borrow_mut()
+                    .set_mode(Mode::Creating(Some(Box::new(Line::default()))));
             }
         });
 
         rect_btn.set_callback({
             let drawpanel = Rc::clone(&drawpanel);
             move |btn| {
-                (*drawpanel).borrow_mut().draw_elem(Rect::default());
+                (*drawpanel)
+                    .borrow_mut()
+                    .set_mode(Mode::Creating(Some(Box::new(Rect::default()))));
             }
         });
 
