@@ -1,6 +1,7 @@
 pub mod line;
 pub mod pen;
 pub mod rect;
+pub mod text;
 
 use geo::{Coordinate, Point};
 
@@ -15,6 +16,13 @@ pub enum Status {
 pub trait Elem {
     fn draw(&self, draw: &Box<dyn Draw>, status: Status);
     fn get_vertex(&self) -> Vec<Coordinate<f64>>;
+    fn get_content(&self) -> &str {
+        ""
+    }
+    fn set_content(&mut self, content: &str) {}
+    fn need_input(&mut self) -> bool {
+        false
+    }
     fn creating(&mut self, from_coord: Coordinate, end_coord: Coordinate);
     fn edit_moving(&mut self, from_coord: Coordinate, end_coord: Coordinate);
     fn edit_resizing(&mut self, from_coord: Coordinate, end_coord: Coordinate, drag_vertex: i32);

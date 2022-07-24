@@ -7,7 +7,7 @@ use std::{
 use geo::{coord, point, Coordinate, EuclideanDistance, Point};
 
 use crate::{
-    binder::{Binder, Draw, DrawLineOpts, EventType},
+    binder::{Binder, Draw, DrawLineOpts, EventType, HookEvent},
     elem::{Elem, Status},
 };
 
@@ -25,6 +25,7 @@ pub struct Drawpanel {
     drag_vertex: i32,
     prev_coord: Coordinate,
     mode: Mode,
+    hook_event: Box<dyn HookEvent>,
 }
 
 impl Drawpanel {
@@ -35,6 +36,7 @@ impl Drawpanel {
             drag_vertex: -1,
             mode: Mode::EditMoving,
             prev_coord: Coordinate::default(),
+            hook_event: binder.hook_event(),
         }));
 
         binder.init(Rc::clone(&drawpanel));
@@ -94,8 +96,13 @@ impl Drawpanel {
                         }
                     }
                     Mode::Creating(elem) => {
-                        if let Some(elem) = elem.take() {
+                        if let Some(mut elem) = elem.take() {
+                            self.hook_event.before_create(&mut elem);
                             self.elems.push(elem);
+                        } else {
+                            let elem = self.elems.last_mut();
+                            self.hook_event.after_create(elem.unwrap());
+                            self.mode = Mode::EditMoving;
                         }
                     }
                     Mode::EditResizing(_) => {}
@@ -107,13 +114,24 @@ impl Drawpanel {
                 }
             }
             EventType::Released => {
-                self.mode = Mode::EditMoving;
+                match self.mode {
+                    Mode::EditMoving => {}
+                    Mode::Creating(_) => {
+                        // let elem = self.elems.last_mut();
+                        // self.hook_event.after_create(elem.unwrap());
+                    }
+                    Mode::EditResizing(_) => {
+                        self.mode = Mode::EditMoving;
+                    }
+                    Mode::Deleting => {}
+                }
             }
             EventType::Drag => match self.mode {
                 Mode::Creating(_) => {
                     let top = elems.last_mut();
                     if let Some(elem) = top {
                         elem.creating(self.prev_coord, mouse_coord);
+                        self.hook_event.creating(elem, mouse_coord);
                     }
                 }
                 Mode::EditMoving => {
