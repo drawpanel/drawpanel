@@ -1,13 +1,13 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, io, rc::Rc};
 
 use drawpanel_bind_fltk::FltkBinder;
 use drawpanel_core::{
     drawpanel::{Drawpanel, Mode},
-    elem::{line::Line, pen::Pen, rect::Rect},
+    elem::{line::Line, pen::Pen, rect::Rect, text::Text},
 };
 use fltk::{
     app::Scheme,
-    enums::{Color, FrameType},
+    enums::{CallbackTrigger, Color, FrameType},
     prelude::*,
     *,
 };
@@ -66,7 +66,7 @@ impl AppView {
         win.end();
         win.show();
 
-        let drawpanel = Drawpanel::new(FltkBinder::new(draw_frm));
+        let drawpanel = Drawpanel::new(FltkBinder::new(draw_frm, win.clone()));
 
         pen_btn.set_callback({
             let drawpanel = Rc::clone(&drawpanel);
@@ -95,8 +95,18 @@ impl AppView {
             }
         });
 
+        text_btn.set_callback({
+            let drawpanel = Rc::clone(&drawpanel);
+            move |btn| {
+                (*drawpanel)
+                    .borrow_mut()
+                    .set_mode(Mode::Creating(Some(Box::new(Text::default()))));
+            }
+        });
+
         remove_btn.set_callback({
             let drawpanel = Rc::clone(&drawpanel);
+            let mut win = win.clone();
             move |btn| {
                 (*drawpanel).borrow_mut().set_mode(Mode::Deleting);
             }
