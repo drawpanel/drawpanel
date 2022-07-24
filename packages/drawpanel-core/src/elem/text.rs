@@ -21,6 +21,18 @@ impl Elem for Text {
 
         match status {
             Status::Default => {
+                draw.draw_text(DrawTextOpts {
+                    left_top_coord: self.lt_coord,
+                    width: self.width,
+                    height: self.height,
+                    content: &self.content,
+                    font_size: (((self.height - 10.) as usize) / calc_string_lines(&self.content))
+                        as u32,
+                    font_space: 0,
+                    font_color: 0,
+                });
+            }
+            Status::Hover => {
                 draw.draw_rect(DrawRectOpts {
                     left_top_coord: self.lt_coord,
                     width: self.width,
@@ -34,34 +46,10 @@ impl Elem for Text {
                     width: self.width,
                     height: self.height,
                     content: &self.content,
-                    font_size: self.height as u32,
+                    font_size: (((self.height - 10.) as usize) / calc_string_lines(&self.content))
+                        as u32,
                     font_space: 0,
                     font_color: 0,
-                    background_color: 0,
-                    border_size: 0,
-                    border_color: 0,
-                });
-            }
-            Status::Hover => {
-                draw.draw_rect(DrawRectOpts {
-                    left_top_coord: self.lt_coord,
-                    width: self.width,
-                    height: self.height,
-                    line_size: 5,
-                    line_color: line_color,
-                    fill_color: 0,
-                });
-                draw.draw_text(DrawTextOpts {
-                    left_top_coord: self.lt_coord,
-                    width: self.width,
-                    height: self.height,
-                    content: &self.content,
-                    font_size: self.height as u32,
-                    font_space: 0,
-                    font_color: 0,
-                    background_color: 0,
-                    border_size: 0,
-                    border_color: 0,
                 });
 
                 let lt = drag_coords.get(0).unwrap();
@@ -111,12 +99,10 @@ impl Elem for Text {
                     width: self.width,
                     height: self.height,
                     content: &self.content,
-                    font_size: self.height as u32,
+                    font_size: (((self.height - 10.) as usize) / calc_string_lines(&self.content))
+                        as u32,
                     font_space: 0,
                     font_color: 0,
-                    background_color: 0,
-                    border_size: 0,
-                    border_color: 0,
                 });
 
                 let lt = drag_coords.get(0).unwrap();
@@ -150,6 +136,26 @@ impl Elem for Text {
                     line_size: 0,
                     line_color,
                     fill_color: 0,
+                });
+            }
+            Status::Creating => {
+                draw.draw_rect(DrawRectOpts {
+                    left_top_coord: self.lt_coord,
+                    width: self.width,
+                    height: self.height,
+                    line_size: 3,
+                    line_color: line_color,
+                    fill_color: 0,
+                });
+                draw.draw_text(DrawTextOpts {
+                    left_top_coord: self.lt_coord,
+                    width: self.width,
+                    height: self.height,
+                    content: &self.content,
+                    font_size: (((self.height - 10.) as usize) / calc_string_lines(&self.content))
+                        as u32,
+                    font_space: 0,
+                    font_color: 0,
                 });
             }
         }
@@ -262,4 +268,9 @@ impl Elem for Text {
             || point! {vertex[2]}.euclidean_distance(&mouse_point) < 10.
             || point! {vertex[3]}.euclidean_distance(&mouse_point) < 10.
     }
+}
+
+fn calc_string_lines(text: &str) -> usize {
+    let t = text.split("\n");
+    t.count()
 }

@@ -54,6 +54,8 @@ impl Drawpanel {
                     } else {
                         Status::Hover
                     }
+                } else if let Mode::Creating(_) = self.mode {
+                    Status::Creating
                 } else {
                     Status::Default
                 },

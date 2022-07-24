@@ -10,6 +10,7 @@ use crate::binder::Draw;
 pub enum Status {
     Default,
     Hover,
+    Creating,
     Resizing(u8),
 }
 

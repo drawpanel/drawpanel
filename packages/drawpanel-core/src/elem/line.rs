@@ -16,14 +16,6 @@ impl Elem for Line {
     fn draw(&self, draw: &Box<dyn Draw>, status: Status) {
         let line_color = 0xff0000;
         match status {
-            Status::Default => {
-                draw.draw_line(DrawLineOpts {
-                    from_coord: self.from_coord,
-                    end_coord: self.end_coord,
-                    line_size: 3,
-                    line_color,
-                });
-            }
             Status::Hover => {
                 draw.draw_line(DrawLineOpts {
                     from_coord: self.from_coord,
@@ -67,6 +59,14 @@ impl Elem for Line {
                     line_size: 1,
                     line_color,
                     fill_color: 0,
+                });
+            }
+            _ => {
+                draw.draw_line(DrawLineOpts {
+                    from_coord: self.from_coord,
+                    end_coord: self.end_coord,
+                    line_size: 3,
+                    line_color,
                 });
             }
         }

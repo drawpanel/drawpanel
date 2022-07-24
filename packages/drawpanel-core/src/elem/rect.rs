@@ -19,16 +19,6 @@ impl Elem for Rect {
         let drag_coords = self.get_vertex();
 
         match status {
-            Status::Default => {
-                draw.draw_rect(DrawRectOpts {
-                    left_top_coord: self.lt_coord,
-                    width: self.width,
-                    height: self.height,
-                    line_size: 3,
-                    line_color: line_color,
-                    fill_color: 0,
-                });
-            }
             Status::Hover => {
                 draw.draw_rect(DrawRectOpts {
                     left_top_coord: self.lt_coord,
@@ -112,6 +102,16 @@ impl Elem for Rect {
                     r: 5.,
                     line_size: 0,
                     line_color,
+                    fill_color: 0,
+                });
+            }
+            _ => {
+                draw.draw_rect(DrawRectOpts {
+                    left_top_coord: self.lt_coord,
+                    width: self.width,
+                    height: self.height,
+                    line_size: 3,
+                    line_color: line_color,
                     fill_color: 0,
                 });
             }

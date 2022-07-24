@@ -24,26 +24,6 @@ impl Elem for Pen {
     fn draw(&self, draw: &Box<dyn Draw>, status: Status) {
         let line_color = 0xff0000;
         match status {
-            Status::Default => {
-                for (i, coord) in self.coords.iter().enumerate() {
-                    if i > 1 {
-                        let prev = self.coords.get(i - 1).unwrap();
-                        draw.draw_line(DrawLineOpts {
-                            from_coord: *prev,
-                            end_coord: *coord,
-                            line_size: 4,
-                            line_color,
-                        });
-                        draw.draw_circle(DrawCircleOpts {
-                            center_coord: *prev,
-                            r: 2.,
-                            line_size: 0,
-                            line_color,
-                            fill_color: line_color,
-                        });
-                    }
-                }
-            }
             Status::Hover => {
                 for (i, coord) in self.coords.iter().enumerate() {
                     if i > 1 {
@@ -111,6 +91,26 @@ impl Elem for Pen {
                     line_color: 0,
                     fill_color: 0,
                 });
+            }
+            _ => {
+                for (i, coord) in self.coords.iter().enumerate() {
+                    if i > 1 {
+                        let prev = self.coords.get(i - 1).unwrap();
+                        draw.draw_line(DrawLineOpts {
+                            from_coord: *prev,
+                            end_coord: *coord,
+                            line_size: 4,
+                            line_color,
+                        });
+                        draw.draw_circle(DrawCircleOpts {
+                            center_coord: *prev,
+                            r: 2.,
+                            line_size: 0,
+                            line_color,
+                            fill_color: line_color,
+                        });
+                    }
+                }
             }
         }
     }

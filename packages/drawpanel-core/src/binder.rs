@@ -43,9 +43,6 @@ pub struct DrawTextOpts<'a> {
     pub font_size: u32,
     pub font_space: u32,
     pub font_color: u32,
-    pub background_color: u32,
-    pub border_size: u32,
-    pub border_color: u32,
 }
 
 pub trait Binder {
