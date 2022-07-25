@@ -14,5 +14,5 @@ categories = ["drawpanel", "drawpanel-bind"]
 
 [dependencies]
 drawpanel-core = { path = "../drawpanel-core" }
-fltk = { git = "https://github.com/fltk-rs/fltk-rs" }
+fltk = "1.3.11"
 geo = {version = "0.22.1" }
