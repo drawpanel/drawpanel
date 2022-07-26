@@ -175,6 +175,7 @@ impl HookEvent for FltkHookEvent {
                 (right_bottom.x - left_top.x - 6.) as i32,
                 (right_bottom.y - left_top.y - 6.) as i32,
             );
+            self.input.take_focus().unwrap();
         }
     }
     fn after_create(&mut self, elem: &mut Box<dyn Elem>) {
