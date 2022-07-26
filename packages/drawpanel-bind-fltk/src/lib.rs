@@ -183,6 +183,7 @@ impl HookEvent for FltkHookEvent {
             elem.set_content(&value);
             self.input.set_size(0, 0);
             self.input.set_value("");
+            self.input.take_focus().unwrap();
         }
     }
 }
