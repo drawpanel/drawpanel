@@ -6,7 +6,8 @@ use crate::{drawpanel::Drawpanel, elem::Elem};
 
 pub enum EventType {
     Move,
-    Push,
+    Push, // Click, Dblclick, Mouseup(Left\Right\Mid), Mousedown
+    Dblclick,
     Released,
     Drag,
 }
@@ -62,4 +63,6 @@ pub trait HookEvent {
     fn before_create(&mut self, elem: &mut Box<dyn Elem>) {}
     fn creating(&mut self, elem: &mut Box<dyn Elem>, mouse_coord: Coordinate) {}
     fn after_create(&mut self, elem: &mut Box<dyn Elem>) {}
+    fn edit_state(&mut self, elem: &mut Box<dyn Elem>, mouse_coord: Coordinate) {}
+    fn edit_end(&mut self, elem: &mut Box<dyn Elem>) {}
 }

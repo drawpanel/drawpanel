@@ -17,6 +17,7 @@ pub enum Mode {
     Creating(Option<Box<dyn Elem>>),
     EditResizing(u8),
     Deleting,
+    EditState,
 }
 
 pub struct Drawpanel {
@@ -70,12 +71,15 @@ impl Drawpanel {
         let elems = &mut self.elems;
         match event_type {
             EventType::Move => {
-                *hover_index.borrow_mut() = -1;
-                let len = elems.len();
-                for (i, elem) in elems.iter().rev().enumerate() {
-                    if elem.hover_condition(mouse_point) {
-                        *hover_index.borrow_mut() = (len - i - 1) as i32;
-                        break;
+                if let Mode::EditState = self.mode {
+                } else {
+                    *hover_index.borrow_mut() = -1;
+                    let len = elems.len();
+                    for (i, elem) in elems.iter().rev().enumerate() {
+                        if elem.hover_condition(mouse_point) {
+                            *hover_index.borrow_mut() = (len - i - 1) as i32;
+                            break;
+                        }
                     }
                 }
             }
@@ -113,6 +117,11 @@ impl Drawpanel {
                             elems.remove(idx as usize);
                         }
                     }
+                    Mode::EditState => {
+                        let elem = self.elems.last_mut();
+                        self.hook_event.after_create(elem.unwrap());
+                        self.mode = Mode::EditMoving;
+                    }
                 }
             }
             EventType::Released => {
@@ -126,6 +135,7 @@ impl Drawpanel {
                         self.mode = Mode::EditMoving;
                     }
                     Mode::Deleting => {}
+                    Mode::EditState => {}
                 }
             }
             EventType::Drag => match self.mode {
@@ -152,7 +162,16 @@ impl Drawpanel {
                     }
                 }
                 Mode::Deleting => {}
+                Mode::EditState => {}
             },
+            EventType::Dblclick => {
+                let idx = *hover_index.borrow_mut();
+                let elem = elems.get_mut(idx as usize);
+                if let Some(elem) = elem {
+                    self.mode = Mode::EditState;
+                    self.hook_event.edit_state(elem, mouse_coord);
+                }
+            }
         };
     }
 
