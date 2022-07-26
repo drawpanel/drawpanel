@@ -26,6 +26,7 @@ impl AppView {
         let mut root_panel = group::Flex::new(0, 0, 700, 600, None).row();
 
         let mut left_panel = group::Flex::default().column();
+        let mut select_btn = button::Button::default().with_label("Select");
         let mut pen_btn = button::Button::default().with_label("Pen");
         let mut line_btn = button::Button::default().with_label("Line");
         let mut rect_btn = button::Button::default().with_label("Rect");
@@ -67,6 +68,13 @@ impl AppView {
         win.show();
 
         let drawpanel = Drawpanel::new(FltkBinder::new(draw_frm, win.clone()));
+
+        select_btn.set_callback({
+            let drawpanel = Rc::clone(&drawpanel);
+            move |btn| {
+                (*drawpanel).borrow_mut().set_mode(Mode::Select);
+            }
+        });
 
         pen_btn.set_callback({
             let drawpanel = Rc::clone(&drawpanel);
