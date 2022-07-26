@@ -48,7 +48,7 @@ pub struct DrawTextOpts<'a> {
 
 pub trait Binder {
     fn init(&mut self, drawpanel: Rc<RefCell<Drawpanel>>);
-    // fn draw(&self) -> Box<dyn Draw>;
+    fn draw(&self) -> Box<dyn Draw>;
     fn hook_event(&self) -> Box<dyn HookEvent>;
 }
 

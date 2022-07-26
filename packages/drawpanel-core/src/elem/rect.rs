@@ -5,7 +5,7 @@ use crate::binder::{Draw, DrawCircleOpts, DrawRectOpts};
 use super::{Elem, Status};
 use geo::{coord, point, Coordinate, EuclideanDistance, Intersects, Point};
 
-#[derive(Debug, Copy, Clone, Default)]
+#[derive(Debug, Clone, Default)]
 pub struct Rect {
     lt_coord: Coordinate, // left top coord
     width: f64,

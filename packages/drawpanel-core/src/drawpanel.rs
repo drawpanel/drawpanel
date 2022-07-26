@@ -1,14 +1,17 @@
 use std::{
     borrow::{Borrow, BorrowMut},
     cell::RefCell,
+    collections::HashSet,
     rc::Rc,
 };
 
-use geo::{coord, point, Coordinate, EuclideanDistance, Point};
+use geo::{
+    coord, point, ChamberlainDuquetteArea, Coordinate, EuclideanDistance, Intersects, Point,
+};
 
 use crate::{
-    binder::{Binder, Draw, DrawLineOpts, EventType, HookEvent},
-    elem::{Elem, Status},
+    binder::{Binder, Draw, DrawLineOpts, DrawRectOpts, EventType, HookEvent},
+    elem::{rect::Rect, Elem, Status},
 };
 
 // #[derive(Debug, Clone, Copy)]
@@ -18,15 +21,19 @@ pub enum Mode {
     EditResizing(u8),
     Deleting,
     EditState,
+    Select,
 }
 
 pub struct Drawpanel {
     elems: Vec<Box<dyn Elem>>,
+    select_box: Option<Rect>,
+    selects: HashSet<u32>,
     hover_index: i32,
     drag_vertex: i32,
     prev_coord: Coordinate,
     mode: Mode,
     hook_event: Box<dyn HookEvent>,
+    draw: Box<dyn Draw>,
 }
 
 impl Drawpanel {
@@ -36,8 +43,11 @@ impl Drawpanel {
             hover_index: -1,
             drag_vertex: -1,
             mode: Mode::EditMoving,
+            select_box: None,
+            selects: HashSet::new(),
             prev_coord: Coordinate::default(),
             hook_event: binder.hook_event(),
+            draw: binder.draw(),
         }));
 
         binder.init(Rc::clone(&drawpanel));
@@ -57,10 +67,16 @@ impl Drawpanel {
                     }
                 } else if let Mode::Creating(_) = self.mode {
                     Status::Creating
+                } else if self.selects.contains(&(i as u32)) {
+                    Status::Hover
                 } else {
                     Status::Default
                 },
             );
+        }
+
+        if let Some(select_box) = &self.select_box {
+            select_box.draw(&draw, Status::Creating)
         }
     }
 
@@ -100,6 +116,20 @@ impl Drawpanel {
                                 }
                             }
                         }
+                        if let Some(select_box) = &self.select_box {
+                            let select_box_ver = select_box.get_vertex();
+                            let tl = select_box_ver.get(0).unwrap();
+                            let br = select_box_ver.get(2).unwrap();
+                            let box_rect = geo::Rect::new(*tl, *br);
+                            if box_rect
+                                .to_polygon()
+                                .euclidean_distance(&geo::Point::from(mouse_coord))
+                                > 0.
+                            {
+                                self.selects.clear();
+                                self.select_box = None;
+                            }
+                        }
                     }
                     Mode::Creating(elem) => {
                         if let Some(mut elem) = elem.take() {
@@ -122,6 +152,10 @@ impl Drawpanel {
                         self.hook_event.after_create(elem.unwrap());
                         self.mode = Mode::EditMoving;
                     }
+                    Mode::Select => {
+                        self.selects.clear();
+                        self.select_box = Some(Rect::default());
+                    }
                 }
             }
             EventType::Released => {
@@ -136,6 +170,26 @@ impl Drawpanel {
                     }
                     Mode::Deleting => {}
                     Mode::EditState => {}
+                    Mode::Select => {
+                        let select_box = self.select_box.borrow_mut().as_ref().unwrap();
+                        let select_box_ver = select_box.get_vertex();
+                        let tl: Coordinate<f64> = *select_box_ver.get(0).unwrap();
+                        let br: Coordinate<f64> = *select_box_ver.get(2).unwrap();
+                        let box_rect = geo::Rect::new(tl, br);
+                        for (i, elem) in self.elems.iter().enumerate() {
+                            let ver = elem.get_vertex();
+                            let mut is_select = true;
+                            for coord in ver {
+                                if !box_rect.intersects(&geo::Point::from(coord)) {
+                                    is_select = false;
+                                }
+                            }
+                            if is_select {
+                                self.selects.insert(i as u32);
+                            }
+                        }
+                        self.mode = Mode::EditMoving;
+                    }
                 }
             }
             EventType::Drag => match self.mode {
@@ -147,10 +201,22 @@ impl Drawpanel {
                     }
                 }
                 Mode::EditMoving => {
-                    let idx = *hover_index.borrow_mut();
-                    let elem = elems.get_mut(idx as usize);
-                    if let Some(elem) = elem {
-                        elem.edit_moving(self.prev_coord, mouse_coord);
+                    if self.selects.is_empty() {
+                        let idx = *hover_index.borrow_mut();
+                        let elem = elems.get_mut(idx as usize);
+                        if let Some(elem) = elem {
+                            elem.edit_moving(self.prev_coord, mouse_coord);
+                            self.prev_coord = mouse_coord;
+                        }
+                    } else {
+                        for idx in self.selects.iter() {
+                            let elem = elems.get_mut((*idx) as usize);
+                            if let Some(elem) = elem {
+                                elem.edit_moving(self.prev_coord, mouse_coord);
+                            }
+                        }
+                        let select_box = self.select_box.as_mut().unwrap();
+                        select_box.edit_moving(self.prev_coord, mouse_coord);
                         self.prev_coord = mouse_coord;
                     }
                 }
@@ -163,6 +229,11 @@ impl Drawpanel {
                 }
                 Mode::Deleting => {}
                 Mode::EditState => {}
+                Mode::Select => {
+                    if let Some(select_box) = self.select_box.borrow_mut() {
+                        select_box.creating(self.prev_coord, mouse_coord);
+                    }
+                }
             },
             EventType::Dblclick => {
                 let idx = *hover_index.borrow_mut();
