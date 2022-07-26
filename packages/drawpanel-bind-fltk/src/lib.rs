@@ -58,6 +58,7 @@ impl Binder for FltkBinder {
             let drawpanel = Rc::clone(&drawpanel);
             move |frm, e| {
                 let (x, y) = app::event_coords();
+                let is_double = app::event_clicks();
                 let mouse_coord = coord! {
                     x: x as f64,
                     y: y as f64
@@ -86,9 +87,15 @@ impl Binder for FltkBinder {
                         true
                     }
                     Event::Released => {
-                        (*drawpanel)
-                            .borrow_mut()
-                            .trigger_event(EventType::Released, mouse_coord);
+                        if is_double {
+                            (*drawpanel)
+                                .borrow_mut()
+                                .trigger_event(EventType::Dblclick, mouse_coord);
+                        } else {
+                            (*drawpanel)
+                                .borrow_mut()
+                                .trigger_event(EventType::Released, mouse_coord);
+                        }
                         frm.redraw();
                         true
                     }
@@ -185,5 +192,15 @@ impl HookEvent for FltkHookEvent {
             self.input.set_size(0, 0);
             self.input.set_value("");
         }
+    }
+
+    fn edit_state(&mut self, elem: &mut Box<dyn Elem>, mouse_coord: Coordinate) {
+        self.input.set_value(elem.get_content());
+        elem.set_content("");
+        self.creating(elem, mouse_coord);
+    }
+
+    fn edit_end(&mut self, elem: &mut Box<dyn Elem>) {
+        self.after_create(elem)
     }
 }
