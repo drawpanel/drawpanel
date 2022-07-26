@@ -110,6 +110,10 @@ impl Binder for FltkBinder {
             input: self.input.clone(),
         })
     }
+
+    fn draw(&self) -> Box<dyn Draw> {
+        Box::new(FltkDraw)
+    }
 }
 
 struct FltkDraw;
