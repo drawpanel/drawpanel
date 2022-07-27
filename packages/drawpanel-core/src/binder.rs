@@ -65,4 +65,5 @@ pub trait HookEvent {
     fn after_create(&mut self, elem: &mut Box<dyn Elem>) {}
     fn edit_state(&mut self, elem: &mut Box<dyn Elem>, mouse_coord: Coordinate) {}
     fn edit_end(&mut self, elem: &mut Box<dyn Elem>) {}
+    fn flush(&mut self) {}
 }
