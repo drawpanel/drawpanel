@@ -255,7 +255,23 @@ impl Drawpanel {
     }
 
     pub fn set_mode(&mut self, mode: Mode) {
-        *self.mode.borrow_mut() = mode;
+        if let Mode::Deleting = mode {
+            if self.selects.is_empty() {
+                *self.mode.borrow_mut() = mode;
+            } else {
+                let mut ver = Vec::from_iter(self.selects.iter());
+                ver.sort();
+                for select in ver.iter().rev() {
+                    self.elems.remove(**select as usize);
+                }
+
+                self.selects.clear();
+                self.select_box = None;
+                self.hook_event.flush();
+            }
+        } else {
+            *self.mode.borrow_mut() = mode;
+        }
     }
 
     pub fn get_mode(&self) -> &Mode {
