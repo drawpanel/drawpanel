@@ -9,7 +9,7 @@ use fltk::{
     app,
     draw::{self, LineStyle},
     enums::{Align, CallbackTrigger, Color, Event, Font, FrameType},
-    frame::Frame,
+    frame::{self, Frame},
     input,
     prelude::{GroupExt, InputExt, WidgetBase, WidgetExt},
     window,
@@ -108,6 +108,7 @@ impl Binder for FltkBinder {
     fn hook_event(&self) -> Box<dyn drawpanel_core::binder::HookEvent> {
         Box::new(FltkHookEvent {
             input: self.input.clone(),
+            frame: self.frame.clone(),
         })
     }
 
@@ -171,6 +172,7 @@ impl Draw for FltkDraw {
 
 struct FltkHookEvent {
     input: input::MultilineInput,
+    frame: frame::Frame,
 }
 
 impl HookEvent for FltkHookEvent {
@@ -206,5 +208,9 @@ impl HookEvent for FltkHookEvent {
 
     fn edit_end(&mut self, elem: &mut Box<dyn Elem>) {
         self.after_create(elem)
+    }
+
+    fn flush(&mut self) {
+        self.frame.redraw();
     }
 }
