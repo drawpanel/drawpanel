@@ -145,7 +145,8 @@ impl Drawpanel {
                     Mode::Deleting => {
                         if idx > -1 {
                             elems.remove(idx as usize);
-                            (*self.selects.borrow_mut()).clear();
+                            self.selects.clear();
+                            self.select_box = None;
                         } else if let Some(select_box) = self.select_box.borrow_mut() {
                             if select_box.hover_condition(mouse_point) {
                                 let mut ver = Vec::from_iter(self.selects.iter());
