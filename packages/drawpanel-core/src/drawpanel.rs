@@ -145,6 +145,19 @@ impl Drawpanel {
                     Mode::Deleting => {
                         if idx > -1 {
                             elems.remove(idx as usize);
+                            (*self.selects.borrow_mut()).clear();
+                        } else if let Some(select_box) = self.select_box.borrow_mut() {
+                            if select_box.hover_condition(mouse_point) {
+                                let mut ver = Vec::from_iter(self.selects.iter());
+                                ver.sort();
+                                for select in ver.iter().rev() {
+                                    elems.remove(**select as usize);
+                                }
+
+                                self.selects.clear();
+                                self.select_box = None;
+                                self.hook_event.flush();
+                            }
                         }
                     }
                     Mode::EditState => {
@@ -255,23 +268,7 @@ impl Drawpanel {
     }
 
     pub fn set_mode(&mut self, mode: Mode) {
-        if let Mode::Deleting = mode {
-            if self.selects.is_empty() {
-                *self.mode.borrow_mut() = mode;
-            } else {
-                let mut ver = Vec::from_iter(self.selects.iter());
-                ver.sort();
-                for select in ver.iter().rev() {
-                    self.elems.remove(**select as usize);
-                }
-
-                self.selects.clear();
-                self.select_box = None;
-                self.hook_event.flush();
-            }
-        } else {
-            *self.mode.borrow_mut() = mode;
-        }
+        *self.mode.borrow_mut() = mode;
     }
 
     pub fn get_mode(&self) -> &Mode {
