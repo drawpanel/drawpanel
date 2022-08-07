@@ -1,13 +1,15 @@
 use std::{cell::RefCell, rc::Rc};
 
 use drawpanel_core::{
-    binder::{Binder, Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, EventType, HookEvent},
+    binder::{
+        Binder, Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, EventType, HookEvent, MouseWheel,
+    },
     drawpanel::Drawpanel,
     elem::{text::Text, Elem},
 };
 use fltk::{
     app,
-    draw::{self, LineStyle},
+    draw::{self, LineStyle, Offscreen},
     enums::{Align, CallbackTrigger, Color, Event, Font, FrameType},
     frame::{self, Frame},
     input,
@@ -49,7 +51,13 @@ impl Binder for FltkBinder {
         self.frame.draw({
             let drawpanel = Rc::clone(&drawpanel);
             move |frm| {
-                (*drawpanel).borrow_mut().trigger_draw(Box::new(FltkDraw));
+                // draw::scale_xy(0., 0.);
+                // draw::scale(3.);
+                // println!("{}", drawpanel.borrow().scale);
+                // draw::scale(drawpanel.borrow().scale);
+                (*drawpanel)
+                    .borrow_mut()
+                    .trigger_draw(Box::new(FltkDraw(Rc::clone(&drawpanel))));
             }
         });
 
@@ -99,6 +107,20 @@ impl Binder for FltkBinder {
                         frm.redraw();
                         true
                     }
+                    Event::MouseWheel => {
+                        (*drawpanel).borrow_mut().trigger_event(
+                            EventType::MouseWheel(match app::event_dy() {
+                                app::MouseWheel::None => MouseWheel::None,
+                                app::MouseWheel::Right => MouseWheel::None,
+                                app::MouseWheel::Left => MouseWheel::None,
+                                app::MouseWheel::Up => MouseWheel::Up,
+                                app::MouseWheel::Down => MouseWheel::Down,
+                            }),
+                            mouse_coord,
+                        );
+                        frm.redraw();
+                        true
+                    }
                     _ => false,
                 }
             }
@@ -112,23 +134,37 @@ impl Binder for FltkBinder {
         })
     }
 
-    fn draw(&self) -> Box<dyn Draw> {
-        Box::new(FltkDraw)
-    }
+    // fn draw(&self) -> Box<dyn Draw> {
+    //     Box::new(FltkDraw(drawpanel))
+    // }
 }
 
-struct FltkDraw;
+struct FltkDraw(Rc<RefCell<Drawpanel>>);
 
 impl Draw for FltkDraw {
     fn draw_line(&self, opts: DrawLineOpts) {
+        // let scale = 2.;
         draw::set_draw_color(Color::from_hex(opts.line_color));
         draw::set_line_style(LineStyle::Solid, opts.line_size as i32);
-        draw::draw_line(
-            opts.from_coord.x as i32,
-            opts.from_coord.y as i32,
-            opts.end_coord.x as i32,
-            opts.end_coord.y as i32,
-        );
+        draw::push_matrix();
+
+        // draw::translate(
+        //     opts.from_coord.x - opts.from_coord.x * scale,
+        //     opts.from_coord.y - opts.from_coord.y * scale,
+        // );
+        // draw::scale(scale);
+        draw::begin_line();
+        draw::vertex(opts.from_coord.x, opts.from_coord.y);
+        draw::vertex(opts.end_coord.x, opts.end_coord.y);
+        draw::end_line();
+
+        draw::pop_matrix();
+        // draw::draw_line(
+        //     opts.from_coord.x as i32,
+        //     opts.from_coord.y as i32,
+        //     opts.end_coord.x as i32,
+        //     opts.end_coord.y as i32,
+        // );
     }
 
     fn draw_rect(&self, opts: DrawRectOpts) {
