@@ -4,7 +4,7 @@ use crate::binder::{Binder, Draw, DrawCircleOpts, DrawLineOpts};
 
 use super::{Elem, Status};
 
-use geo::{Coordinate, EuclideanDistance, Point};
+use geo::{coord, Coordinate, EuclideanDistance, Point};
 
 #[derive(Debug, Copy, Clone, Default)]
 pub struct Line {
@@ -13,7 +13,7 @@ pub struct Line {
 }
 
 impl Elem for Line {
-    fn draw(&self, draw: &Box<dyn Draw>, status: Status) {
+    fn draw(&self, draw: &Box<dyn Draw>, status: Status, scale: f64) {
         let line_color = 0xff0000;
         match status {
             Status::Hover => {
@@ -62,10 +62,24 @@ impl Elem for Line {
                 });
             }
             _ => {
+                let center = coord! {x: 100., y: 100.};
+                let mut from = self.from_coord.clone();
+                let mut end = self.end_coord.clone();
+                // from.x = (from.x * scale);
+                // from.y = from.y * scale;
+                // end.x = end.x * scale;
+                // end.y = end.y * scale;
+                // println!(
+                //     "from:{:?},end:{:?},line:{:?}",
+                //     from,
+                //     end,
+                //     (line.dx(), line.dy())
+                // );
+
                 draw.draw_line(DrawLineOpts {
-                    from_coord: self.from_coord,
-                    end_coord: self.end_coord,
-                    line_size: 3,
+                    from_coord: from,
+                    end_coord: end,
+                    line_size: 3, //((3 as f64) * scale) as u32,
                     line_color,
                 });
             }

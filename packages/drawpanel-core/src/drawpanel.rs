@@ -33,7 +33,8 @@ pub struct Drawpanel {
     prev_coord: Coordinate,
     mode: Mode,
     hook_event: Box<dyn HookEvent>,
-    draw: Box<dyn Draw>,
+    // draw: Box<dyn Draw>,
+    pub scale: f64,
 }
 
 impl Drawpanel {
@@ -47,7 +48,8 @@ impl Drawpanel {
             selects: HashSet::new(),
             prev_coord: Coordinate::default(),
             hook_event: binder.hook_event(),
-            draw: binder.draw(),
+            // draw: binder.draw(),
+            scale: 1.,
         }));
 
         binder.init(Rc::clone(&drawpanel));
@@ -72,11 +74,12 @@ impl Drawpanel {
                 } else {
                     Status::Default
                 },
+                self.scale,
             );
         }
 
         if let Some(select_box) = &self.select_box {
-            select_box.draw(&draw, Status::Creating)
+            select_box.draw(&draw, Status::Creating, self.scale)
         }
     }
 
@@ -257,6 +260,15 @@ impl Drawpanel {
                     self.hook_event.edit_state(elem, mouse_coord);
                 }
             }
+            EventType::MouseWheel(wheel) => match wheel {
+                crate::binder::MouseWheel::None => {}
+                crate::binder::MouseWheel::Up => {
+                    self.scale += 0.1;
+                }
+                crate::binder::MouseWheel::Down => {
+                    self.scale -= 0.1;
+                }
+            },
         };
     }
 

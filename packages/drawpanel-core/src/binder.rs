@@ -4,12 +4,19 @@ use geo::Coordinate;
 
 use crate::{drawpanel::Drawpanel, elem::Elem};
 
+pub enum MouseWheel {
+    None,
+    Up,
+    Down,
+}
+
 pub enum EventType {
     Move,
     Push, // Click, Dblclick, Mouseup(Left\Right\Mid), Mousedown
     Dblclick,
     Released,
     Drag,
+    MouseWheel(MouseWheel),
 }
 
 pub struct DrawLineOpts {
@@ -48,7 +55,7 @@ pub struct DrawTextOpts<'a> {
 
 pub trait Binder {
     fn init(&mut self, drawpanel: Rc<RefCell<Drawpanel>>);
-    fn draw(&self) -> Box<dyn Draw>;
+    // fn draw(&self) -> Box<dyn Draw>;
     fn hook_event(&self) -> Box<dyn HookEvent>;
 }
 

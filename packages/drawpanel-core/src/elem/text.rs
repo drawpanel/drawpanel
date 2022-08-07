@@ -14,7 +14,7 @@ pub struct Text {
 }
 
 impl Elem for Text {
-    fn draw(&self, draw: &Box<dyn Draw>, status: Status) {
+    fn draw(&self, draw: &Box<dyn Draw>, status: Status, scale: f64) {
         let line_color = 0xff0000;
 
         let drag_coords = self.get_vertex();

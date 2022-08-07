@@ -15,7 +15,7 @@ pub enum Status {
 }
 
 pub trait Elem {
-    fn draw(&self, draw: &Box<dyn Draw>, status: Status);
+    fn draw(&self, draw: &Box<dyn Draw>, status: Status, scale: f64);
     fn get_vertex(&self) -> Vec<Coordinate<f64>>;
     fn get_content(&self) -> &str {
         ""

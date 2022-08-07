@@ -21,7 +21,7 @@ impl Default for Pen {
 }
 
 impl Elem for Pen {
-    fn draw(&self, draw: &Box<dyn Draw>, status: Status) {
+    fn draw(&self, draw: &Box<dyn Draw>, status: Status, scale: f64) {
         let line_color = 0xff0000;
         match status {
             Status::Hover => {

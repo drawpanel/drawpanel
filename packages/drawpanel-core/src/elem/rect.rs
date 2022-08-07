@@ -13,7 +13,7 @@ pub struct Rect {
 }
 
 impl Elem for Rect {
-    fn draw(&self, draw: &Box<dyn Draw>, status: Status) {
+    fn draw(&self, draw: &Box<dyn Draw>, status: Status, scale: f64) {
         let line_color = 0xff0000;
 
         let drag_coords = self.get_vertex();
@@ -106,10 +106,14 @@ impl Elem for Rect {
                 });
             }
             _ => {
+                let mut center = coord! {x: 250., y: 250.};
+                let mut lt_coord = self.lt_coord.clone();
+                lt_coord.x += (center.x - lt_coord.x) * scale;
+                // lt_coord.y *= scale;
                 draw.draw_rect(DrawRectOpts {
-                    left_top_coord: self.lt_coord,
-                    width: self.width,
-                    height: self.height,
+                    left_top_coord: lt_coord,
+                    width: self.width * scale,
+                    height: self.height * scale,
                     line_size: 3,
                     line_color: line_color,
                     fill_color: 0,
