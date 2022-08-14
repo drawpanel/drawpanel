@@ -1,6 +1,9 @@
 use std::rc::Rc;
 
-use crate::binder::{Binder, Draw, DrawCircleOpts, DrawLineOpts};
+use crate::{
+    binder::{Binder, Draw, DrawCircleOpts, DrawLineOpts},
+    draw_wrap::DrawWrap,
+};
 
 use super::{Elem, Status};
 
@@ -13,7 +16,7 @@ pub struct Line {
 }
 
 impl Elem for Line {
-    fn draw(&self, draw: &Box<dyn Draw>, status: Status) {
+    fn draw(&self, draw: &DrawWrap<'_>, status: Status) {
         let line_color = 0xff0000;
         match status {
             Status::Hover => {

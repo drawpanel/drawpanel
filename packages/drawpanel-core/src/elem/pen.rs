@@ -1,6 +1,9 @@
 use std::{default, rc::Rc};
 
-use crate::binder::{Binder, Draw, DrawCircleOpts, DrawLineOpts};
+use crate::{
+    binder::{Binder, Draw, DrawCircleOpts, DrawLineOpts},
+    draw_wrap::DrawWrap,
+};
 
 use super::{Elem, Status};
 
@@ -21,7 +24,7 @@ impl Default for Pen {
 }
 
 impl Elem for Pen {
-    fn draw(&self, draw: &Box<dyn Draw>, status: Status) {
+    fn draw(&self, draw: &DrawWrap<'_>, status: Status) {
         let line_color = 0xff0000;
         match status {
             Status::Hover => {

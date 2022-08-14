@@ -2,7 +2,7 @@ use std::{cell::RefCell, rc::Rc};
 
 use geo::Coordinate;
 
-use crate::{drawpanel::Drawpanel, elem::Elem};
+use crate::{drawpanel::Drawpanel, elem::Elem, panel::Panel};
 
 pub enum EventType {
     Move,
@@ -47,7 +47,7 @@ pub struct DrawTextOpts<'a> {
 }
 
 pub trait Binder {
-    fn init(&mut self, drawpanel: Rc<RefCell<Drawpanel>>);
+    fn init(&mut self, panel: Rc<RefCell<Panel>>);
     fn draw(&self) -> Box<dyn Draw>;
     fn hook_event(&self) -> Box<dyn HookEvent>;
 }
@@ -60,10 +60,40 @@ pub trait Draw {
 }
 
 pub trait HookEvent {
-    fn before_create(&mut self, elem: &mut Box<dyn Elem>) {}
-    fn creating(&mut self, elem: &mut Box<dyn Elem>, mouse_coord: Coordinate) {}
-    fn after_create(&mut self, elem: &mut Box<dyn Elem>) {}
-    fn edit_state(&mut self, elem: &mut Box<dyn Elem>, mouse_coord: Coordinate) {}
-    fn edit_end(&mut self, elem: &mut Box<dyn Elem>) {}
+    fn begin_create(
+        &mut self,
+        elem: &Box<dyn Elem>,
+        mouse_coord: Coordinate,
+        // panel: Rc<RefCell<Panel>>,
+    ) {
+    }
+    fn doing_create(
+        &mut self,
+        elem: &mut Box<dyn Elem>,
+        mouse_coord: Coordinate,
+        // panel: Rc<RefCell<Panel>>,
+    ) {
+    }
+    fn end_create(
+        &mut self,
+        elem: &mut Box<dyn Elem>,
+        mouse_coord: Coordinate,
+        // panel: Rc<RefCell<Panel>>,
+    ) {
+    }
+    fn begin_edit_state(&mut self, elem: &mut Box<dyn Elem>, event_rect: EventRect) {}
+    fn end_edit_state(
+        &mut self,
+        elem: &mut Box<dyn Elem>,
+        mouse_coord: Coordinate,
+        // panel: Rc<RefCell<Panel>>,
+    ) {
+    }
     fn flush(&mut self) {}
+}
+
+pub struct EventRect {
+    pub coord: Coordinate,
+    pub width: f64,
+    pub height: f64,
 }

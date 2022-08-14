@@ -5,7 +5,7 @@ pub mod text;
 
 use geo::{Coordinate, Point};
 
-use crate::binder::Draw;
+use crate::draw_wrap::DrawWrap;
 
 pub enum Status {
     Default,
@@ -15,13 +15,13 @@ pub enum Status {
 }
 
 pub trait Elem {
-    fn draw(&self, draw: &Box<dyn Draw>, status: Status);
+    fn draw(&self, draw: &DrawWrap, status: Status);
     fn get_vertex(&self) -> Vec<Coordinate<f64>>;
     fn get_content(&self) -> &str {
         ""
     }
     fn set_content(&mut self, content: &str) {}
-    fn need_input(&mut self) -> bool {
+    fn need_input(&self) -> bool {
         false
     }
     fn creating(&mut self, from_coord: Coordinate, end_coord: Coordinate);

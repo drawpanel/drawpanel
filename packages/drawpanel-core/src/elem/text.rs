@@ -1,6 +1,7 @@
-use std::os::macos::raw::stat;
-
-use crate::binder::{Draw, DrawCircleOpts, DrawRectOpts, DrawTextOpts};
+use crate::{
+    binder::{Draw, DrawCircleOpts, DrawRectOpts, DrawTextOpts},
+    draw_wrap::DrawWrap,
+};
 
 use super::{Elem, Status};
 use geo::{coord, point, Coordinate, EuclideanDistance, Intersects, Point};
@@ -14,7 +15,7 @@ pub struct Text {
 }
 
 impl Elem for Text {
-    fn draw(&self, draw: &Box<dyn Draw>, status: Status) {
+    fn draw(&self, draw: &DrawWrap, status: Status) {
         let line_color = 0xff0000;
 
         let drag_coords = self.get_vertex();
@@ -187,7 +188,7 @@ impl Elem for Text {
 
         Vec::from([tl, tr, br, bl])
     }
-    fn need_input(&mut self) -> bool {
+    fn need_input(&self) -> bool {
         true
     }
     fn get_content(&self) -> &str {

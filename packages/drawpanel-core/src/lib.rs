@@ -1,6 +1,8 @@
 pub mod binder;
+mod draw_wrap;
 pub mod drawpanel;
 pub mod elem;
+pub mod panel;
 
 // #[cfg(test)]
 // mod tests {

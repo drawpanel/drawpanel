@@ -1,19 +1,22 @@
 use std::os::macos::raw::stat;
 
-use crate::binder::{Draw, DrawCircleOpts, DrawRectOpts};
+use crate::{
+    binder::{Draw, DrawCircleOpts, DrawRectOpts},
+    draw_wrap::DrawWrap,
+};
 
 use super::{Elem, Status};
 use geo::{coord, point, Coordinate, EuclideanDistance, Intersects, Point};
 
 #[derive(Debug, Clone, Default)]
 pub struct Rect {
-    lt_coord: Coordinate, // left top coord
-    width: f64,
-    height: f64,
+    pub lt_coord: Coordinate, // left top coord
+    pub width: f64,
+    pub height: f64,
 }
 
 impl Elem for Rect {
-    fn draw(&self, draw: &Box<dyn Draw>, status: Status) {
+    fn draw(&self, draw: &DrawWrap<'_>, status: Status) {
         let line_color = 0xff0000;
 
         let drag_coords = self.get_vertex();
