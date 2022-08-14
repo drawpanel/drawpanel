@@ -1,9 +1,12 @@
 use std::{cell::RefCell, rc::Rc};
 
 use drawpanel_core::{
-    binder::{Binder, Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, EventType, HookEvent},
+    binder::{
+        Binder, Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, EventRect, EventType, HookEvent,
+    },
     drawpanel::Drawpanel,
-    elem::{text::Text, Elem},
+    elem::Elem,
+    panel::Panel,
 };
 use fltk::{
     app,
@@ -19,6 +22,7 @@ use geo::{coord, Coordinate};
 pub struct FltkBinder {
     frame: Frame,
     input: input::MultilineInput,
+    // panel: Option<Rc<RefCell<Panel>>>,
 }
 
 impl FltkBinder {
@@ -40,22 +44,26 @@ impl FltkBinder {
             }
         });
 
-        FltkBinder { frame, input }
+        FltkBinder {
+            frame,
+            input,
+            // panel: None,
+        }
     }
 }
 
 impl Binder for FltkBinder {
-    fn init(&mut self, drawpanel: Rc<RefCell<Drawpanel>>) {
+    fn init(&mut self, panel: Rc<RefCell<Panel>>) {
         self.frame.draw({
-            let drawpanel = Rc::clone(&drawpanel);
+            let drawpanel = Rc::clone(&panel);
             move |frm| {
-                (*drawpanel).borrow_mut().trigger_draw(Box::new(FltkDraw));
+                (*drawpanel).borrow_mut().trigger_draw();
             }
         });
 
         self.frame.handle({
             let mut input = self.input.clone();
-            let drawpanel = Rc::clone(&drawpanel);
+            let drawpanel = Rc::clone(&panel);
             move |frm, e| {
                 let (x, y) = app::event_coords();
                 let is_double = app::event_clicks();
@@ -69,21 +77,18 @@ impl Binder for FltkBinder {
                             .borrow_mut()
                             .trigger_event(EventType::Move, mouse_coord);
                         input.redraw();
-                        frm.redraw();
                         true
                     }
                     Event::Push => {
                         (*drawpanel)
                             .borrow_mut()
                             .trigger_event(EventType::Push, mouse_coord);
-                        frm.redraw();
                         true
                     }
                     Event::Drag => {
                         (*drawpanel)
                             .borrow_mut()
                             .trigger_event(EventType::Drag, mouse_coord);
-                        frm.redraw();
                         true
                     }
                     Event::Released => {
@@ -96,13 +101,18 @@ impl Binder for FltkBinder {
                                 .borrow_mut()
                                 .trigger_event(EventType::Released, mouse_coord);
                         }
-                        frm.redraw();
                         true
                     }
                     _ => false,
                 }
             }
         });
+
+        // self.panel = Some(panel.clone());
+    }
+
+    fn draw(&self) -> Box<dyn Draw> {
+        Box::new(FltkDraw)
     }
 
     fn hook_event(&self) -> Box<dyn drawpanel_core::binder::HookEvent> {
@@ -110,10 +120,6 @@ impl Binder for FltkBinder {
             input: self.input.clone(),
             frame: self.frame.clone(),
         })
-    }
-
-    fn draw(&self) -> Box<dyn Draw> {
-        Box::new(FltkDraw)
     }
 }
 
@@ -173,41 +179,45 @@ impl Draw for FltkDraw {
 struct FltkHookEvent {
     input: input::MultilineInput,
     frame: frame::Frame,
+    // panel: Rc<RefCell<Panel>>,
 }
 
 impl HookEvent for FltkHookEvent {
-    fn before_create(&mut self, elem: &mut Box<dyn Elem>) {}
-    fn creating(&mut self, elem: &mut Box<dyn Elem>, mouse_coord: Coordinate) {
+    // fn begin_create(&mut self, elem: &Box<dyn Elem>) {
+    //     println!("before_create");
+    // }
+    // fn doing_create(&mut self, elem: &mut Box<dyn Elem>, mouse_coord: Coordinate) {
+    //     println!("doing_create");
+    // }
+    // fn end_create(&mut self, elem: &mut Box<dyn Elem>) {
+    //     println!("after_create");
+    // }
+
+    fn begin_edit_state(&mut self, elem: &mut Box<dyn Elem>, event_rect: EventRect) {
+        self.input.set_value(elem.get_content());
+        elem.set_content("");
         if elem.need_input() {
-            let ver = elem.get_vertex();
-            let left_top = ver.get(0).unwrap();
-            let right_bottom = ver.get(2).unwrap();
-            self.input
-                .set_pos((left_top.x + 3.) as i32, (left_top.y + 3.) as i32);
+            self.input.set_pos(
+                (event_rect.coord.x + 3.) as i32,
+                (event_rect.coord.y + 3.) as i32,
+            );
             self.input.set_size(
-                (right_bottom.x - left_top.x - 6.) as i32,
-                (right_bottom.y - left_top.y - 6.) as i32,
+                (event_rect.width - 6.) as i32,
+                (event_rect.height - 6.) as i32,
             );
             self.input.take_focus().unwrap();
         }
+        println!("edit_state");
     }
-    fn after_create(&mut self, elem: &mut Box<dyn Elem>) {
+
+    fn end_edit_state(&mut self, elem: &mut Box<dyn Elem>, mouse_coord: Coordinate) {
         if elem.need_input() {
             let value = self.input.value();
             elem.set_content(&value);
             self.input.set_size(0, 0);
             self.input.set_value("");
+            println!("edit_end");
         }
-    }
-
-    fn edit_state(&mut self, elem: &mut Box<dyn Elem>, mouse_coord: Coordinate) {
-        self.input.set_value(elem.get_content());
-        elem.set_content("");
-        self.creating(elem, mouse_coord);
-    }
-
-    fn edit_end(&mut self, elem: &mut Box<dyn Elem>) {
-        self.after_create(elem)
     }
 
     fn flush(&mut self) {
