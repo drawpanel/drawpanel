@@ -32,6 +32,8 @@ impl AppView {
         let mut rect_btn = button::Button::default().with_label("Rect");
         let mut text_btn = button::Button::default().with_label("Text");
         let mut remove_btn = button::Button::default().with_label("Remove");
+        let mut up_scale_btn = button::Button::default().with_label("UP");
+        let mut down_scale_btn = button::Button::default().with_label("Down");
         let mut status_frm = frame::Frame::default();
 
         left_panel.set_size(&status_frm, 200);
@@ -67,7 +69,10 @@ impl AppView {
         win.end();
         win.show();
 
-        let drawpanel = Drawpanel::new(FltkBinder::new(draw_frm, win.clone()));
+        let drawpanel = Rc::new(RefCell::new(Drawpanel::new(FltkBinder::new(
+            draw_frm,
+            win.clone(),
+        ))));
 
         select_btn.set_callback({
             let drawpanel = Rc::clone(&drawpanel);
@@ -117,6 +122,24 @@ impl AppView {
             let mut win = win.clone();
             move |btn| {
                 (*drawpanel).borrow_mut().set_mode(Mode::Deleting);
+            }
+        });
+
+        up_scale_btn.set_callback({
+            let drawpanel = Rc::clone(&drawpanel);
+            let mut win = win.clone();
+            move |btn| {
+                let scale = drawpanel.borrow_mut().scale();
+                (*drawpanel).borrow_mut().set_scale(scale + 0.1);
+            }
+        });
+
+        down_scale_btn.set_callback({
+            let drawpanel = Rc::clone(&drawpanel);
+            let mut win = win.clone();
+            move |btn| {
+                let scale = drawpanel.borrow_mut().scale();
+                (*drawpanel).borrow_mut().set_scale(scale - 0.1);
             }
         });
 
