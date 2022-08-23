@@ -69,10 +69,17 @@ impl AppView {
         win.end();
         win.show();
 
-        let drawpanel = Rc::new(RefCell::new(Drawpanel::new(FltkBinder::new(
-            draw_frm,
-            win.clone(),
-        ))));
+        let dp_x = *&draw_frm.x() as f64;
+        let dp_y = *&draw_frm.y() as f64;
+        let dp_w = *&draw_frm.w() as f64;
+        let dp_h = *&draw_frm.h() as f64;
+        let drawpanel = Rc::new(RefCell::new(Drawpanel::new(
+            FltkBinder::new(draw_frm, win.clone()),
+            dp_x,
+            dp_y,
+            dp_w,
+            dp_h,
+        )));
 
         select_btn.set_callback({
             let drawpanel = Rc::clone(&drawpanel);
