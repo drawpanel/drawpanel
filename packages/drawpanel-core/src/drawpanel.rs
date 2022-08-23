@@ -30,9 +30,16 @@ pub struct Drawpanel {
 }
 
 impl Drawpanel {
-    pub fn new(mut binder: impl Binder) -> Self {
+    pub fn new(mut binder: impl Binder, x: f64, y: f64, w: f64, h: f64) -> Self {
         let drawpanel = Drawpanel {
-            panel: Rc::new(RefCell::new(Panel::new(binder.draw(), binder.hook_event()))),
+            panel: Rc::new(RefCell::new(Panel::new(
+                binder.draw(),
+                binder.hook_event(),
+                x,
+                y,
+                w,
+                h,
+            ))),
         };
 
         binder.init(drawpanel.panel.clone());

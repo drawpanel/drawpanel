@@ -30,11 +30,18 @@ pub struct Panel {
 }
 
 impl Panel {
-    pub fn new(draw: Box<dyn Draw>, hook_event: Box<dyn HookEvent>) -> Panel {
+    pub fn new(
+        draw: Box<dyn Draw>,
+        hook_event: Box<dyn HookEvent>,
+        x: f64,
+        y: f64,
+        w: f64,
+        h: f64,
+    ) -> Panel {
         Panel {
-            lt_coord: coord! { x: 150., y:100. },
-            width: 200.,
-            height: 200.,
+            lt_coord: coord! { x: x, y: y },
+            width: w,
+            height: h,
             scale: 1.,
 
             hover_index: -1,
