@@ -52,10 +52,9 @@ impl Drawpanel {
         panel.hook_event.flush();
     }
 
-    pub fn set_scale(&mut self, val: f64) {
+    pub fn set_scale(&mut self, val: f64, x: f64, y: f64) {
         let mut panel = (*self.panel).borrow_mut();
-        panel.scale = val;
-        panel.hook_event.flush();
+        panel.set_scale(val, x, y)
     }
 
     pub fn scale(&self) -> f64 {

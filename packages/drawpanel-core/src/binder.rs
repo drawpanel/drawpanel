@@ -4,12 +4,19 @@ use geo::Coordinate;
 
 use crate::{drawpanel::Drawpanel, elem::Elem, panel::Panel};
 
+pub enum EventZoom {
+    None,
+    Up,
+    Down,
+}
+
 pub enum EventType {
     Move,
     Push, // Click, Dblclick, Mouseup(Left\Right\Mid), Mousedown
     Dblclick,
     Released,
     Drag,
+    Zoom(EventZoom),
 }
 
 pub struct DrawLineOpts {

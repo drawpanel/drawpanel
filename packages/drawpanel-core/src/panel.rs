@@ -3,7 +3,7 @@ use std::{borrow::BorrowMut, cell::RefCell, collections::HashSet, rc::Rc};
 use crate::{
     binder::{
         Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, DrawTextOpts, EventRect, EventType,
-        HookEvent,
+        EventZoom, HookEvent,
     },
     draw_wrap::DrawWrap,
     drawpanel::Mode,
@@ -14,10 +14,12 @@ use geo::{coord, point, Coordinate, EuclideanDistance, Intersects, Point};
 
 // #[derive(Debug)]
 pub struct Panel {
+    pub raw_lt_coord: Coordinate,
     pub lt_coord: Coordinate,
     pub width: f64,
     pub height: f64,
     pub scale: f64,
+    pub scale_coord: Option<Coordinate>,
     pub elems: Vec<Box<dyn Elem>>,
     pub hover_index: isize,
     pub drag_vertex: isize,
@@ -39,11 +41,12 @@ impl Panel {
         h: f64,
     ) -> Panel {
         Panel {
+            raw_lt_coord: coord! { x: x, y: y },
             lt_coord: coord! { x: x, y: y },
             width: w,
             height: h,
             scale: 1.,
-
+            scale_coord: None,
             hover_index: -1,
             drag_vertex: -1,
             mode: Mode::EditMoving,
@@ -67,6 +70,15 @@ impl Panel {
             line_color: 0x000000,
             fill_color: 0,
         });
+        if let Some(scale_coord) = &self.scale_coord {
+            draw.draw_circle(DrawCircleOpts {
+                center_coord: *scale_coord,
+                r: 5.,
+                line_size: 0,
+                line_color: 0x000000,
+                fill_color: 0x000000,
+            })
+        }
         let draw = DrawWrap::new(&draw, self);
         for (i, elem) in self.elems.iter().enumerate() {
             elem.draw(
@@ -91,8 +103,8 @@ impl Panel {
         }
     }
 
-    pub fn trigger_event(&mut self, event_type: EventType, mouse_coord: Coordinate) {
-        let relative_coord = self.relative_coord(mouse_coord);
+    pub fn trigger_event(&mut self, event_type: EventType, inp_mouse_coord: Coordinate) {
+        let relative_coord = self.relative_coord(inp_mouse_coord);
         let mouse_point = point!(relative_coord);
         let hover_index = &mut self.hover_index;
         let drag_vertex = &mut self.drag_vertex;
@@ -278,6 +290,15 @@ impl Panel {
                     self.hook_event.begin_edit_state(elem, event_rect);
                 }
             }
+            EventType::Zoom(zoom) => match zoom {
+                EventZoom::None => {}
+                EventZoom::Up => {
+                    self.set_scale(self.scale + 0.01, inp_mouse_coord.x, inp_mouse_coord.y);
+                }
+                EventZoom::Down => {
+                    self.set_scale(self.scale - 0.01, inp_mouse_coord.x, inp_mouse_coord.y);
+                }
+            },
         };
         self.hook_event.flush();
     }
@@ -291,6 +312,19 @@ impl Panel {
             width: w_h.x * self.scale,
             height: w_h.y * self.scale,
         }
+    }
+
+    pub fn set_scale(&mut self, val: f64, x: f64, y: f64) {
+        let scale_coord = coord! {
+            x: x,//350.,
+            y: y//300.
+        };
+        let mut panel = (*self).borrow_mut();
+        panel.scale = val;
+        panel.scale_coord = Some(scale_coord);
+        panel.lt_coord.x = panel.raw_lt_coord.x * val + scale_coord.x * (1. - val);
+        panel.lt_coord.y = panel.raw_lt_coord.y * val + scale_coord.y * (1. - val);
+        panel.hook_event.flush();
     }
 
     pub fn scale(&self) -> f64 {
