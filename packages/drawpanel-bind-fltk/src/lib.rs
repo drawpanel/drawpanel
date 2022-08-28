@@ -2,7 +2,8 @@ use std::{cell::RefCell, rc::Rc};
 
 use drawpanel_core::{
     binder::{
-        Binder, Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, EventRect, EventType, HookEvent,
+        Binder, Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, EventRect, EventType, EventZoom,
+        HookEvent,
     },
     drawpanel::Drawpanel,
     elem::Elem,
@@ -101,6 +102,18 @@ impl Binder for FltkBinder {
                                 .borrow_mut()
                                 .trigger_event(EventType::Released, mouse_coord);
                         }
+                        true
+                    }
+                    Event::ZoomGesture => {
+                        println!("zoom {:?}", app::event_dy());
+                        (*drawpanel).borrow_mut().trigger_event(
+                            EventType::Zoom(match app::event_dy() {
+                                app::MouseWheel::Up => EventZoom::Up,
+                                app::MouseWheel::Down => EventZoom::Down,
+                                _ => EventZoom::None,
+                            }),
+                            mouse_coord,
+                        );
                         true
                     }
                     _ => false,

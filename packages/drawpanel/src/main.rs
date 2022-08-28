@@ -137,7 +137,7 @@ impl AppView {
             let mut win = win.clone();
             move |btn| {
                 let scale = drawpanel.borrow_mut().scale();
-                (*drawpanel).borrow_mut().set_scale(scale + 0.1);
+                (*drawpanel).borrow_mut().set_scale(scale + 0.1, 350., 300.);
             }
         });
 
@@ -146,7 +146,7 @@ impl AppView {
             let mut win = win.clone();
             move |btn| {
                 let scale = drawpanel.borrow_mut().scale();
-                (*drawpanel).borrow_mut().set_scale(scale - 0.1);
+                (*drawpanel).borrow_mut().set_scale(scale - 0.1, 350., 300.);
             }
         });
 
