@@ -104,7 +104,7 @@ impl Binder for FltkBinder {
                         }
                         true
                     }
-                    Event::ZoomGesture => {
+                    Event::ZoomGesture | Event::MouseWheel => {
                         println!("zoom {:?}", app::event_dy());
                         (*drawpanel).borrow_mut().trigger_event(
                             EventType::Zoom(match app::event_dy() {
