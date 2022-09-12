@@ -1,4 +1,4 @@
-use std::{borrow::BorrowMut, cell::RefCell, collections::HashSet, rc::Rc};
+use std::{borrow::BorrowMut, cell::RefCell, collections::HashSet, rc::Rc, time::Instant};
 
 use crate::{
     binder::{
@@ -315,16 +315,14 @@ impl Panel {
     }
 
     pub fn set_scale(&mut self, val: f64, x: f64, y: f64) {
-        let scale_coord = coord! {
-            x: x,//350.,
-            y: y//300.
-        };
-        let mut panel = (*self).borrow_mut();
-        panel.scale = val;
-        panel.scale_coord = Some(scale_coord);
-        panel.lt_coord.x = panel.raw_lt_coord.x * val + scale_coord.x * (1. - val);
-        panel.lt_coord.y = panel.raw_lt_coord.y * val + scale_coord.y * (1. - val);
-        panel.hook_event.flush();
+        let zoom = self.scale - val;
+        let scale_coord = coord! { x:x, y:y  };
+
+        self.scale = val;
+        self.scale_coord = Some(scale_coord);
+        self.lt_coord.x = self.lt_coord.x * (1. - zoom) + scale_coord.x * zoom;
+        self.lt_coord.y = self.lt_coord.y * (1. - zoom) + scale_coord.y * zoom;
+        self.hook_event.flush();
     }
 
     pub fn scale(&self) -> f64 {
