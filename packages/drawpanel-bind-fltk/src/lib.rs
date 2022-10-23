@@ -2,8 +2,8 @@ use std::{cell::RefCell, rc::Rc};
 
 use drawpanel_core::{
     binder::{
-        Binder, Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, EventRect, EventType, EventZoom,
-        HookEvent,
+        Binder, Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, EventMouseButton, EventRect,
+        EventType, EventZoom, HookEvent,
     },
     drawpanel::Drawpanel,
     elem::Elem,
@@ -72,24 +72,30 @@ impl Binder for FltkBinder {
                     x: x as f64,
                     y: y as f64
                 };
+                let mouse_button = match app::event_mouse_button() {
+                    app::MouseButton::Left => EventMouseButton::Left,
+                    app::MouseButton::Middle => EventMouseButton::Middle,
+                    app::MouseButton::Right => EventMouseButton::Right,
+                    _ => EventMouseButton::None,
+                };
                 match e {
                     Event::Move => {
                         (*drawpanel)
                             .borrow_mut()
-                            .trigger_event(EventType::Move, mouse_coord);
+                            .trigger_event(EventType::Move(mouse_button), mouse_coord);
                         input.redraw();
                         true
                     }
                     Event::Push => {
                         (*drawpanel)
                             .borrow_mut()
-                            .trigger_event(EventType::Push, mouse_coord);
+                            .trigger_event(EventType::Push(EventMouseButton::None), mouse_coord);
                         true
                     }
                     Event::Drag => {
                         (*drawpanel)
                             .borrow_mut()
-                            .trigger_event(EventType::Drag, mouse_coord);
+                            .trigger_event(EventType::Drag(mouse_button), mouse_coord);
                         true
                     }
                     Event::Released => {
@@ -100,7 +106,7 @@ impl Binder for FltkBinder {
                         } else {
                             (*drawpanel)
                                 .borrow_mut()
-                                .trigger_event(EventType::Released, mouse_coord);
+                                .trigger_event(EventType::Released(mouse_button), mouse_coord);
                         }
                         true
                     }

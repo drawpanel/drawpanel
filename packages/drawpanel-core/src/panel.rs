@@ -25,10 +25,12 @@ pub struct Panel {
     pub drag_vertex: isize,
     pub mode: Mode,
     pub prev_coord: Coordinate,
+    pub raw_prev_coord: Coordinate,
     pub draw: Box<dyn Draw>,
     pub hook_event: Box<dyn HookEvent>,
     pub select_box: Option<Rect>,
     pub selects: HashSet<u32>,
+    pub event_flag: i32,
 }
 
 impl Panel {
@@ -51,12 +53,14 @@ impl Panel {
             drag_vertex: -1,
             mode: Mode::EditMoving,
             prev_coord: coord! { x: 0., y:0. },
+            raw_prev_coord: coord! { x: 0., y:0. },
             elems: vec![],
             draw,
             hook_event,
 
             select_box: None,
             selects: HashSet::new(),
+            event_flag: 0,
         }
     }
 
@@ -110,7 +114,7 @@ impl Panel {
         let drag_vertex = &mut self.drag_vertex;
 
         match event_type {
-            EventType::Move => {
+            EventType::Move(_) => {
                 if let Mode::EditState = self.mode {
                 } else {
                     *hover_index.borrow_mut() = -1;
@@ -123,8 +127,9 @@ impl Panel {
                     }
                 }
             }
-            EventType::Push => {
+            EventType::Push(_) => {
                 self.prev_coord = relative_coord;
+                self.raw_prev_coord = inp_mouse_coord;
                 let idx = *hover_index;
 
                 match &mut self.mode {
@@ -197,7 +202,7 @@ impl Panel {
                     }
                 }
             }
-            EventType::Released => match self.mode {
+            EventType::Released(_) => match self.mode {
                 Mode::EditMoving => {}
                 Mode::Creating(_) => {
                     let elem = self.elems.last().unwrap();
@@ -236,7 +241,7 @@ impl Panel {
                     self.mode = Mode::EditMoving;
                 }
             },
-            EventType::Drag => match self.mode {
+            EventType::Drag(mouse_button) => match self.mode {
                 Mode::Creating(_) => {
                     let top = self.elems.last_mut();
                     if let Some(elem) = top {
@@ -245,24 +250,32 @@ impl Panel {
                     }
                 }
                 Mode::EditMoving => {
+                    let mut is_move_elem = false;
                     if self.selects.is_empty() {
                         let idx = *hover_index;
                         let elem = self.elems.get_mut(idx as usize);
                         if let Some(elem) = elem {
                             elem.edit_moving(self.prev_coord, relative_coord);
-                            self.prev_coord = relative_coord;
+                            is_move_elem = true;
                         }
                     } else {
                         for idx in self.selects.iter() {
                             let elem = self.elems.get_mut((*idx) as usize);
                             if let Some(elem) = elem {
                                 elem.edit_moving(self.prev_coord, relative_coord);
+                                is_move_elem = true;
                             }
                         }
                         let select_box = self.select_box.as_mut().unwrap();
                         select_box.edit_moving(self.prev_coord, relative_coord);
-                        self.prev_coord = relative_coord;
                     }
+
+                    if !is_move_elem {
+                        self.move_pos(self.raw_prev_coord, inp_mouse_coord);
+                    }
+
+                    self.raw_prev_coord = inp_mouse_coord;
+                    self.prev_coord = relative_coord;
                 }
                 Mode::EditResizing(_) => {
                     let idx = *hover_index;
@@ -330,8 +343,10 @@ impl Panel {
         self.scale
     }
 
-    pub fn scale_mut(&mut self, val: f64) {
-        self.scale = val;
+    pub fn move_pos(&mut self, prev: Coordinate, target: Coordinate) {
+        let diff = target - prev;
+        self.lt_coord.x += diff.x;
+        self.lt_coord.y += diff.y;
     }
 
     pub fn relative_coord(&self, coord: Coordinate) -> Coordinate {

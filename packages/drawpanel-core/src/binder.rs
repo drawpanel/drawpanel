@@ -4,18 +4,27 @@ use geo::Coordinate;
 
 use crate::{drawpanel::Drawpanel, elem::Elem, panel::Panel};
 
+#[derive(Debug)]
 pub enum EventZoom {
     None,
     Grow,
     Dwindle,
 }
 
+#[derive(Debug)]
+pub enum EventMouseButton {
+    None,
+    Left,
+    Middle,
+    Right,
+}
+
 pub enum EventType {
-    Move,
-    Push, // Click, Dblclick, Mouseup(Left\Right\Mid), Mousedown
+    Move(EventMouseButton),
+    Push(EventMouseButton), // Click, Dblclick, Mouseup(Left\Right\Mid), Mousedown
     Dblclick,
-    Released,
-    Drag,
+    Released(EventMouseButton),
+    Drag(EventMouseButton),
     Zoom(EventZoom),
 }
 
