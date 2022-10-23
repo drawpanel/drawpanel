@@ -316,12 +316,13 @@ impl Panel {
 
     pub fn set_scale(&mut self, val: f64, x: f64, y: f64) {
         let zoom = self.scale - val;
-        let scale_coord = coord! { x:x, y:y  };
+        let scale_coord = self.relative_coord(coord! {x:x, y:y });
+
+        self.lt_coord.x += (scale_coord.x) * zoom;
+        self.lt_coord.y += (scale_coord.y) * zoom;
 
         self.scale = val;
-        self.scale_coord = Some(scale_coord);
-        self.lt_coord.x = self.lt_coord.x * (1. - zoom) + scale_coord.x * zoom;
-        self.lt_coord.y = self.lt_coord.y * (1. - zoom) + scale_coord.y * zoom;
+
         self.hook_event.flush();
     }
 
