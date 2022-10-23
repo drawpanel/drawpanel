@@ -292,10 +292,10 @@ impl Panel {
             }
             EventType::Zoom(zoom) => match zoom {
                 EventZoom::None => {}
-                EventZoom::Up => {
+                EventZoom::Grow => {
                     self.set_scale(self.scale + 0.01, inp_mouse_coord.x, inp_mouse_coord.y);
                 }
-                EventZoom::Down => {
+                EventZoom::Dwindle => {
                     self.set_scale(self.scale - 0.01, inp_mouse_coord.x, inp_mouse_coord.y);
                 }
             },

@@ -6,8 +6,8 @@ use crate::{drawpanel::Drawpanel, elem::Elem, panel::Panel};
 
 pub enum EventZoom {
     None,
-    Up,
-    Down,
+    Grow,
+    Dwindle,
 }
 
 pub enum EventType {
