@@ -1,12 +1,13 @@
+use std::fmt::Debug;
 use std::{cell::RefCell, rc::Rc};
 
 use drawpanel_core::{
     binder::{
         Binder, Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, EventMouseButton, EventRect,
-        EventType, EventZoom, HookEvent,
+        EventType, EventZoom, HookEvent, IDraw, IHookEvent,
     },
     drawpanel::Drawpanel,
-    elem::Elem,
+    elem::{Elem, IElem},
     panel::Panel,
 };
 use fltk::{
@@ -129,11 +130,11 @@ impl Binder for FltkBinder {
         // self.panel = Some(panel.clone());
     }
 
-    fn draw(&self) -> Box<dyn Draw> {
+    fn draw(&self) -> Box<dyn IDraw> {
         Box::new(FltkDraw)
     }
 
-    fn hook_event(&self) -> Box<dyn drawpanel_core::binder::HookEvent> {
+    fn hook_event(&self) -> Box<dyn IHookEvent> {
         Box::new(FltkHookEvent {
             input: self.input.clone(),
             frame: self.frame.clone(),
@@ -141,7 +142,10 @@ impl Binder for FltkBinder {
     }
 }
 
+#[derive(Debug)]
 struct FltkDraw;
+
+impl IDraw for FltkDraw {}
 
 impl Draw for FltkDraw {
     fn draw_line(&self, opts: DrawLineOpts) {
@@ -194,11 +198,14 @@ impl Draw for FltkDraw {
     }
 }
 
+#[derive(Debug)]
 struct FltkHookEvent {
     input: input::MultilineInput,
     frame: frame::Frame,
     // panel: Rc<RefCell<Panel>>,
 }
+
+impl IHookEvent for FltkHookEvent {}
 
 impl HookEvent for FltkHookEvent {
     // fn begin_create(&mut self, elem: &Box<dyn Elem>) {
@@ -211,7 +218,7 @@ impl HookEvent for FltkHookEvent {
     //     println!("after_create");
     // }
 
-    fn begin_edit_state(&mut self, elem: &mut Box<dyn Elem>, event_rect: EventRect) {
+    fn begin_edit_state(&mut self, elem: &mut Box<dyn IElem>, event_rect: EventRect) {
         self.input.set_value(elem.get_content());
         elem.set_content("");
         if elem.need_input() {
@@ -228,7 +235,7 @@ impl HookEvent for FltkHookEvent {
         println!("edit_state");
     }
 
-    fn end_edit_state(&mut self, elem: &mut Box<dyn Elem>, mouse_coord: Coordinate) {
+    fn end_edit_state(&mut self, elem: &mut Box<dyn IElem>, mouse_coord: Coordinate) {
         if elem.need_input() {
             let value = self.input.value();
             elem.set_content(&value);

@@ -1,18 +1,23 @@
 use crate::{
     binder::{Draw, DrawCircleOpts, DrawRectOpts, DrawTextOpts},
     draw_wrap::DrawWrap,
+    serde_helper::CoordinateRef,
 };
 
-use super::{Elem, Status};
+use super::{Elem, IElem, Status};
 use geo::{coord, point, Coordinate, EuclideanDistance, Intersects, Point};
+use serde::Serialize;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct Text {
+    #[serde(with = "CoordinateRef")]
     lt_coord: Coordinate, // left top coord
     width: f64,
     height: f64,
     content: String,
 }
+
+impl IElem for Text {}
 
 impl Elem for Text {
     fn draw(&self, draw: &DrawWrap, status: Status) {

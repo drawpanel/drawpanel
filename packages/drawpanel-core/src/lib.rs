@@ -3,6 +3,7 @@ mod draw_wrap;
 pub mod drawpanel;
 pub mod elem;
 pub mod panel;
+pub mod serde_helper;
 
 // #[cfg(test)]
 // mod tests {

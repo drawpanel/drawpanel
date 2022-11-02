@@ -3,17 +3,23 @@ use std::rc::Rc;
 use crate::{
     binder::{Binder, Draw, DrawCircleOpts, DrawLineOpts},
     draw_wrap::DrawWrap,
+    serde_helper::CoordinateRef,
 };
 
-use super::{Elem, Status};
+use super::{Elem, IElem, Status};
 
 use geo::{Coordinate, EuclideanDistance, Point};
+use serde::Serialize;
 
-#[derive(Debug, Copy, Clone, Default)]
+#[derive(Debug, Copy, Clone, Default, Serialize)]
 pub struct Line {
+    #[serde(with = "CoordinateRef")]
     pub from_coord: Coordinate,
+    #[serde(with = "CoordinateRef")]
     pub end_coord: Coordinate,
 }
+
+impl IElem for Line {}
 
 impl Elem for Line {
     fn draw(&self, draw: &DrawWrap<'_>, status: Status) {

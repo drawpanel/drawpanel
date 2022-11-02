@@ -3,17 +3,22 @@ use std::os::macos::raw::stat;
 use crate::{
     binder::{Draw, DrawCircleOpts, DrawRectOpts},
     draw_wrap::DrawWrap,
+    serde_helper::CoordinateRef,
 };
 
-use super::{Elem, Status};
+use super::{Elem, IElem, Status};
 use geo::{coord, point, Coordinate, EuclideanDistance, Intersects, Point};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct Rect {
+    #[serde(with = "CoordinateRef")]
     pub lt_coord: Coordinate, // left top coord
     pub width: f64,
     pub height: f64,
 }
+
+impl IElem for Rect {}
 
 impl Elem for Rect {
     fn draw(&self, draw: &DrawWrap<'_>, status: Status) {

@@ -1,33 +1,46 @@
-use std::{borrow::BorrowMut, cell::RefCell, collections::HashSet, rc::Rc, time::Instant};
+use std::{
+    borrow::BorrowMut, cell::RefCell, collections::HashSet, fmt::Debug, rc::Rc, time::Instant,
+};
 
 use crate::{
     binder::{
         Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, DrawTextOpts, EventRect, EventType,
-        EventZoom, HookEvent,
+        EventZoom, HookEvent, IDraw, IHookEvent,
     },
     draw_wrap::DrawWrap,
     drawpanel::Mode,
-    elem::{line::Line, rect::Rect, Elem, Status},
+    elem::{line::Line, rect::Rect, Elem, IElem, Status},
+    serde_helper::{option_coordinate, CoordinateRef},
 };
 
 use geo::{coord, point, Coordinate, EuclideanDistance, Intersects, Point};
 
-// #[derive(Debug)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Debug)]
 pub struct Panel {
+    #[serde(with = "CoordinateRef")]
     pub raw_lt_coord: Coordinate,
+    #[serde(with = "CoordinateRef")]
     pub lt_coord: Coordinate,
     pub width: f64,
     pub height: f64,
     pub scale: f64,
+    #[serde(default, with = "option_coordinate")]
     pub scale_coord: Option<Coordinate>,
-    pub elems: Vec<Box<dyn Elem>>,
+    pub elems: Vec<Box<dyn IElem>>,
     pub hover_index: isize,
     pub drag_vertex: isize,
+    #[serde(skip)]
     pub mode: Mode,
+    #[serde(with = "CoordinateRef")]
     pub prev_coord: Coordinate,
+    #[serde(with = "CoordinateRef")]
     pub raw_prev_coord: Coordinate,
-    pub draw: Box<dyn Draw>,
-    pub hook_event: Box<dyn HookEvent>,
+    #[serde(skip)]
+    pub draw: Box<dyn IDraw>,
+    #[serde(skip)]
+    pub hook_event: Box<dyn IHookEvent>,
     pub select_box: Option<Rect>,
     pub selects: HashSet<u32>,
     pub event_flag: i32,
@@ -35,8 +48,8 @@ pub struct Panel {
 
 impl Panel {
     pub fn new(
-        draw: Box<dyn Draw>,
-        hook_event: Box<dyn HookEvent>,
+        draw: Box<dyn IDraw>,
+        hook_event: Box<dyn IHookEvent>,
         x: f64,
         y: f64,
         w: f64,
@@ -74,15 +87,6 @@ impl Panel {
             line_color: 0x000000,
             fill_color: 0,
         });
-        if let Some(scale_coord) = &self.scale_coord {
-            draw.draw_circle(DrawCircleOpts {
-                center_coord: *scale_coord,
-                r: 5.,
-                line_size: 0,
-                line_color: 0x000000,
-                fill_color: 0x000000,
-            })
-        }
         let draw = DrawWrap::new(&draw, self);
         for (i, elem) in self.elems.iter().enumerate() {
             elem.draw(
@@ -361,4 +365,10 @@ impl Panel {
             y: (self.lt_coord.y + coord.y) * self.scale + self.lt_coord.y * (1. - self.scale),
         }
     }
+
+    pub fn export(&self) -> String {
+        return serde_json::to_string(self).unwrap();
+    }
+
+    pub fn import() {}
 }

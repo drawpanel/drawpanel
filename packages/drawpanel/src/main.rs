@@ -34,6 +34,7 @@ impl AppView {
         let mut remove_btn = button::Button::default().with_label("Remove");
         let mut up_scale_btn = button::Button::default().with_label("UP");
         let mut down_scale_btn = button::Button::default().with_label("Down");
+        let mut export_btn = button::Button::default().with_label("Export");
         let mut status_frm = frame::Frame::default();
 
         left_panel.set_size(&status_frm, 200);
@@ -147,6 +148,14 @@ impl AppView {
             move |btn| {
                 let scale = drawpanel.borrow_mut().scale();
                 (*drawpanel).borrow_mut().set_scale(scale - 0.1, 350., 300.);
+            }
+        });
+
+        export_btn.set_callback({
+            let drawpanel = Rc::clone(&drawpanel);
+            let mut win = win.clone();
+            move |btn| {
+                println!("{}", (*drawpanel).borrow().export());
             }
         });
 

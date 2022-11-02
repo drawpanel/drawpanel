@@ -3,7 +3,10 @@ pub mod pen;
 pub mod rect;
 pub mod text;
 
+use erased_serde::serialize_trait_object;
 use geo::{Coordinate, Point};
+use serde::{Deserialize, Serialize, Serializer};
+use std::fmt::Debug;
 
 use crate::draw_wrap::DrawWrap;
 
@@ -14,6 +17,8 @@ pub enum Status {
     Resizing(u8),
 }
 
+pub trait IElem: Elem + Debug + erased_serde::Serialize {}
+serialize_trait_object!(IElem);
 pub trait Elem {
     fn draw(&self, draw: &DrawWrap, status: Status);
     fn get_vertex(&self) -> Vec<Coordinate<f64>>;

@@ -1,15 +1,15 @@
 use crate::{
-    binder::{Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, DrawTextOpts},
+    binder::{Draw, DrawCircleOpts, DrawLineOpts, DrawRectOpts, DrawTextOpts, IDraw},
     panel::Panel,
 };
 
 pub struct DrawWrap<'a> {
-    draw: &'a Box<dyn Draw>,
+    draw: &'a Box<dyn IDraw>,
     panel: &'a Panel,
 }
 
 impl<'a> DrawWrap<'a> {
-    pub fn new(draw: &'a Box<dyn Draw>, panel: &'a Panel) -> Self {
+    pub fn new(draw: &'a Box<dyn IDraw>, panel: &'a Panel) -> Self {
         Self { draw, panel }
     }
 }

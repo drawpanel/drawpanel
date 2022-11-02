@@ -1,24 +1,11 @@
-use std::{
-    borrow::{Borrow, BorrowMut},
-    cell::RefCell,
-    collections::HashSet,
-    rc::Rc,
-};
+use std::{cell::RefCell, rc::Rc};
 
-use geo::{
-    coord, point, ChamberlainDuquetteArea, Coordinate, EuclideanDistance, Intersects, Point,
-};
+use crate::{binder::Binder, elem::IElem, panel::Panel};
 
-use crate::{
-    binder::{Binder, Draw, DrawLineOpts, DrawRectOpts, EventType, HookEvent},
-    elem::{rect::Rect, Elem, Status},
-    panel::Panel,
-};
-
-// #[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub enum Mode {
     EditMoving, // default
-    Creating(Option<Box<dyn Elem>>),
+    Creating(Option<Box<dyn IElem>>),
     EditResizing(u8),
     Deleting,
     EditState,
@@ -85,4 +72,8 @@ impl Drawpanel {
     // pub fn mode_mut(&mut self) -> &mut Mode {
     //     &mut self.borrow_mut().panel.mode
     // }
+
+    pub fn export(&self) -> String {
+        return self.panel.borrow().export();
+    }
 }

@@ -3,16 +3,18 @@ use std::{default, rc::Rc};
 use crate::{
     binder::{Binder, Draw, DrawCircleOpts, DrawLineOpts},
     draw_wrap::DrawWrap,
+    serde_helper::{vec_coordinate, CoordinateRef},
 };
 
-use super::{Elem, Status};
+use super::{Elem, IElem, Status};
 
 use geo::{coord, Coordinate, EuclideanDistance, Line, LineString, Point, Polygon};
+use serde::Serialize;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Pen {
-    coords: Vec<Coordinate>,
-    // last_coord: Option<Coordinate>,
+    #[serde(default, with = "vec_coordinate")]
+    pub coords: Vec<Coordinate>,
 }
 
 impl Default for Pen {
@@ -22,6 +24,8 @@ impl Default for Pen {
         }
     }
 }
+
+impl IElem for Pen {}
 
 impl Elem for Pen {
     fn draw(&self, draw: &DrawWrap<'_>, status: Status) {
