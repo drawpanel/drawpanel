@@ -26,8 +26,6 @@ pub struct Panel {
     pub width: f64,
     pub height: f64,
     pub scale: f64,
-    #[serde(default, with = "option_coordinate")]
-    pub scale_coord: Option<Coordinate>,
     pub elems: Vec<Box<dyn IElem>>,
     pub hover_index: isize,
     pub drag_vertex: isize,
@@ -46,6 +44,8 @@ pub struct Panel {
     pub event_flag: i32,
 }
 
+pub struct PanelSerialize {}
+
 impl Panel {
     pub fn new(
         draw: Box<dyn IDraw>,
@@ -61,7 +61,6 @@ impl Panel {
             width: w,
             height: h,
             scale: 1.,
-            scale_coord: None,
             hover_index: -1,
             drag_vertex: -1,
             mode: Mode::EditMoving,
