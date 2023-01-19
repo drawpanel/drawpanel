@@ -6,11 +6,9 @@ use crate::{
 
 use super::{Elem, IElem, Status};
 use geo::{coord, point, Coordinate, EuclideanDistance, Intersects, Point};
-use serde::Serialize;
 
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Debug, Clone, Default)]
 pub struct Text {
-    #[serde(with = "CoordinateRef")]
     lt_coord: Coordinate, // left top coord
     width: f64,
     height: f64,
@@ -273,6 +271,32 @@ impl Elem for Text {
             || point! {vertex[1]}.euclidean_distance(&mouse_point) < 10.
             || point! {vertex[2]}.euclidean_distance(&mouse_point) < 10.
             || point! {vertex[3]}.euclidean_distance(&mouse_point) < 10.
+    }
+
+    fn elem_type(&self) -> String {
+        "text".to_string()
+    }
+
+    fn export(&self) -> String {
+        format!(
+            "{},{},{},{},{}",
+            self.lt_coord.x, self.lt_coord.y, self.width, self.height, self.content
+        )
+    }
+
+    fn import(&self, content: &str) -> Box<dyn IElem> {
+        let mut t = content.split(",");
+        let x = t.next().unwrap().parse::<f64>().unwrap();
+        let y = t.next().unwrap().parse::<f64>().unwrap();
+        let w = t.next().unwrap().parse::<f64>().unwrap();
+        let h = t.next().unwrap().parse::<f64>().unwrap();
+        let c = t.next().unwrap();
+        Box::new(Text {
+            lt_coord: coord! {x: x, y: y},
+            width: w,
+            height: h,
+            content: String::from(c),
+        })
     }
 }
 

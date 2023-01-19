@@ -3,16 +3,13 @@ use std::os::macos::raw::stat;
 use crate::{
     binder::{Draw, DrawCircleOpts, DrawRectOpts},
     draw_wrap::DrawWrap,
-    serde_helper::CoordinateRef,
 };
 
 use super::{Elem, IElem, Status};
 use geo::{coord, point, Coordinate, EuclideanDistance, Intersects, Point};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Debug, Clone, Default)]
 pub struct Rect {
-    #[serde(with = "CoordinateRef")]
     pub lt_coord: Coordinate, // left top coord
     pub width: f64,
     pub height: f64,
@@ -222,5 +219,31 @@ impl Elem for Rect {
             || point! {vertex[1]}.euclidean_distance(&mouse_point) < 10.
             || point! {vertex[2]}.euclidean_distance(&mouse_point) < 10.
             || point! {vertex[3]}.euclidean_distance(&mouse_point) < 10.
+    }
+
+    fn elem_type(&self) -> String {
+        "rect".to_string()
+    }
+
+    fn export(&self) -> String {
+        format!(
+            "{},{},{},{}",
+            self.lt_coord.x, self.lt_coord.y, self.width, self.height
+        )
+    }
+
+    fn import(&self, content: &str) -> Box<dyn IElem> {
+        let mut coords = content.split(',');
+        let lt_x = coords.next().unwrap().parse::<f64>().unwrap();
+        let lt_y = coords.next().unwrap().parse::<f64>().unwrap();
+        let width = coords.next().unwrap().parse::<f64>().unwrap();
+        let height = coords.next().unwrap().parse::<f64>().unwrap();
+
+        Box::new(Rect {
+            lt_coord: coord! {x: lt_x, y: lt_y},
+            width,
+            height,
+            ..Default::default()
+        })
     }
 }

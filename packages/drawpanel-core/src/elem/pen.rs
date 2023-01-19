@@ -9,11 +9,9 @@ use crate::{
 use super::{Elem, IElem, Status};
 
 use geo::{coord, Coordinate, EuclideanDistance, Line, LineString, Point, Polygon};
-use serde::Serialize;
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct Pen {
-    #[serde(default, with = "vec_coordinate")]
     pub coords: Vec<Coordinate>,
 }
 
@@ -160,5 +158,32 @@ impl Elem for Pen {
 
     fn hover_condition(&self, mouse_point: Point) -> bool {
         LineString::new(self.coords.clone()).euclidean_distance(&mouse_point) < 10.
+    }
+
+    fn elem_type(&self) -> String {
+        "pen".to_string()
+    }
+
+    fn export(&self) -> String {
+        let mut result = String::new();
+        for coord in self.coords.iter() {
+            result.push_str(&format!("{},{};", coord.x, coord.y));
+        }
+        result
+    }
+
+    fn import(&self, content: &str) -> Box<dyn IElem> {
+        let mut coords = vec![];
+        for coord in content.split(';') {
+            if coord.is_empty() {
+                continue;
+            }
+            let coord: Vec<f64> = coord.split(',').map(|x| x.parse().unwrap()).collect();
+            coords.push(Coordinate {
+                x: coord[0],
+                y: coord[1],
+            });
+        }
+        Box::new(Pen { coords })
     }
 }

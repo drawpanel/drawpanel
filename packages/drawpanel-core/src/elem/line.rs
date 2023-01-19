@@ -9,13 +9,10 @@ use crate::{
 use super::{Elem, IElem, Status};
 
 use geo::{Coordinate, EuclideanDistance, Point};
-use serde::Serialize;
 
-#[derive(Debug, Copy, Clone, Default, Serialize)]
+#[derive(Debug, Copy, Clone, Default)]
 pub struct Line {
-    #[serde(with = "CoordinateRef")]
     pub from_coord: Coordinate,
-    #[serde(with = "CoordinateRef")]
     pub end_coord: Coordinate,
 }
 
@@ -115,5 +112,31 @@ impl Elem for Line {
     fn hover_condition(&self, mouse_point: Point) -> bool {
         let t_line = geo::Line::new(self.from_coord, self.end_coord);
         mouse_point.euclidean_distance(&t_line) < 10.
+    }
+
+    fn export(&self) -> String {
+        format!(
+            "{},{},{},{}",
+            self.from_coord.x, self.from_coord.y, self.end_coord.x, self.end_coord.y
+        )
+    }
+
+    fn import(&self, content: &str) -> Box<dyn IElem> {
+        let mut content = content.split(',');
+        let from_x = content.next().unwrap().parse::<f64>().unwrap();
+        let from_y = content.next().unwrap().parse::<f64>().unwrap();
+        let end_x = content.next().unwrap().parse::<f64>().unwrap();
+        let end_y = content.next().unwrap().parse::<f64>().unwrap();
+        Box::new(Line {
+            from_coord: Coordinate {
+                x: from_x,
+                y: from_y,
+            },
+            end_coord: Coordinate { x: end_x, y: end_y },
+        })
+    }
+
+    fn elem_type(&self) -> String {
+        "line".to_string()
     }
 }

@@ -9,19 +9,21 @@ use crate::{
     },
     draw_wrap::DrawWrap,
     drawpanel::Mode,
-    elem::{line::Line, rect::Rect, Elem, IElem, Status},
+    elem::{line::Line, pen::Pen, rect::Rect, Elem, IElem, Status},
     serde_helper::{option_coordinate, CoordinateRef},
 };
 
+use erased_serde::Deserializer;
 use geo::{coord, point, Coordinate, EuclideanDistance, Intersects, Point};
 
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap as Map;
 
-#[derive(Serialize, Debug)]
+#[derive(Debug)]
 pub struct Panel {
-    #[serde(with = "CoordinateRef")]
+    // #[serde(with = "CoordinateRef")]
     pub raw_lt_coord: Coordinate,
-    #[serde(with = "CoordinateRef")]
+    // #[serde(with = "CoordinateRef")]
     pub lt_coord: Coordinate,
     pub width: f64,
     pub height: f64,
@@ -29,22 +31,27 @@ pub struct Panel {
     pub elems: Vec<Box<dyn IElem>>,
     pub hover_index: isize,
     pub drag_vertex: isize,
-    #[serde(skip)]
+    // #[serde(skip)]
     pub mode: Mode,
-    #[serde(with = "CoordinateRef")]
+    // #[serde(with = "CoordinateRef")]
     pub prev_coord: Coordinate,
-    #[serde(with = "CoordinateRef")]
+    // #[serde(with = "CoordinateRef")]
     pub raw_prev_coord: Coordinate,
-    #[serde(skip)]
+    // #[serde(skip)]
     pub draw: Box<dyn IDraw>,
-    #[serde(skip)]
+    // #[serde(skip)]
     pub hook_event: Box<dyn IHookEvent>,
     pub select_box: Option<Rect>,
     pub selects: HashSet<u32>,
     pub event_flag: i32,
+
+    pub register_elem_map: Map<String, Box<dyn IElem>>,
 }
 
-pub struct PanelSerialize {}
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PanelSerialize {
+    pub elems: Vec<String>,
+}
 
 impl Panel {
     pub fn new(
@@ -54,7 +61,14 @@ impl Panel {
         y: f64,
         w: f64,
         h: f64,
+        register_elem: Vec<Box<dyn IElem>>,
     ) -> Panel {
+        let mut register_elem_map: Map<String, Box<dyn IElem>> = Map::new();
+
+        for elem in register_elem {
+            register_elem_map.insert(elem.elem_type().to_string(), elem);
+        }
+
         Panel {
             raw_lt_coord: coord! { x: x, y: y },
             lt_coord: coord! { x: x, y: y },
@@ -73,6 +87,8 @@ impl Panel {
             select_box: None,
             selects: HashSet::new(),
             event_flag: 0,
+
+            register_elem_map,
         }
     }
 
@@ -366,8 +382,33 @@ impl Panel {
     }
 
     pub fn export(&self) -> String {
-        return serde_json::to_string(self).unwrap();
+        let mut panel_serialize = PanelSerialize { elems: vec![] };
+        for elem in self.elems.iter() {
+            let elem_seria = format!(r#"{}({})"#, elem.elem_type(), elem.export());
+            panel_serialize.elems.push(elem_seria);
+        }
+        return serde_json::to_string(&panel_serialize).unwrap();
     }
 
-    pub fn import() {}
+    pub fn import(&mut self, data: &str) {
+        let json = &mut serde_json::Deserializer::from_slice(data.as_bytes());
+        let mut json: Box<dyn Deserializer> = Box::new(<dyn Deserializer>::erase(json));
+        let panel_serialize: PanelSerialize = erased_serde::deserialize(&mut json).unwrap();
+
+        let mut elems: Vec<Box<dyn IElem>> = Vec::new();
+
+        for elem_seria in panel_serialize.elems.iter() {
+            // 解析出类型和元素
+            let elem_type = elem_seria.split("(").next().unwrap();
+            let elem_seria = elem_seria.split("(").nth(1).unwrap();
+            let elem_seria = elem_seria.split(")").next().unwrap();
+
+            let elem = self.borrow_mut().register_elem_map.get(elem_type).unwrap();
+            let elem = elem.import(elem_seria);
+            elems.push(elem);
+        }
+
+        self.elems = elems;
+        self.hook_event.flush();
+    }
 }

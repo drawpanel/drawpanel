@@ -17,8 +17,8 @@ pub enum Status {
     Resizing(u8),
 }
 
-pub trait IElem: Elem + Debug + erased_serde::Serialize {}
-serialize_trait_object!(IElem);
+pub trait IElem: Elem + Debug {}
+
 pub trait Elem {
     fn draw(&self, draw: &DrawWrap, status: Status);
     fn get_vertex(&self) -> Vec<Coordinate<f64>>;
@@ -33,4 +33,13 @@ pub trait Elem {
     fn edit_moving(&mut self, from_coord: Coordinate, end_coord: Coordinate);
     fn edit_resizing(&mut self, from_coord: Coordinate, end_coord: Coordinate, drag_vertex: i32);
     fn hover_condition(&self, mouse_point: Point) -> bool;
+    fn export(&self) -> String {
+        todo!("export")
+    }
+    fn import(&self, content: &str) -> Box<dyn IElem> {
+        todo!("import")
+    }
+    fn elem_type(&self) -> String {
+        todo!("type");
+    }
 }

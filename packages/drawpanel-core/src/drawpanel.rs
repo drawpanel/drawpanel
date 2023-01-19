@@ -1,6 +1,10 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, collections::HashSet, rc::Rc};
 
-use crate::{binder::Binder, elem::IElem, panel::Panel};
+use crate::{
+    binder::Binder,
+    elem::{self, IElem},
+    panel::Panel,
+};
 
 #[derive(Debug)]
 pub enum Mode {
@@ -26,6 +30,12 @@ impl Drawpanel {
                 y,
                 w,
                 h,
+                vec![
+                    Box::new(elem::pen::Pen::default()) as Box<dyn IElem>,
+                    Box::new(elem::line::Line::default()) as Box<dyn IElem>,
+                    Box::new(elem::rect::Rect::default()) as Box<dyn IElem>,
+                    Box::new(elem::text::Text::default()) as Box<dyn IElem>,
+                ],
             ))),
         };
 
@@ -75,5 +85,10 @@ impl Drawpanel {
 
     pub fn export(&self) -> String {
         return self.panel.borrow().export();
+    }
+
+    pub fn import(&mut self, data: &str) {
+        let mut panel = (*self.panel).borrow_mut();
+        panel.import(data);
     }
 }
