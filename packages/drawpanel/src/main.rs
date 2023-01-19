@@ -1,4 +1,4 @@
-use std::{cell::RefCell, io, rc::Rc};
+use std::{borrow::Borrow, cell::RefCell, io, rc::Rc};
 
 use drawpanel_bind_fltk::FltkBinder;
 use drawpanel_core::{
@@ -35,6 +35,7 @@ impl AppView {
         let mut up_scale_btn = button::Button::default().with_label("UP");
         let mut down_scale_btn = button::Button::default().with_label("Down");
         let mut export_btn = button::Button::default().with_label("Export");
+        let mut import_btn = button::Button::default().with_label("Import");
         let mut status_frm = frame::Frame::default();
 
         left_panel.set_size(&status_frm, 200);
@@ -150,12 +151,26 @@ impl AppView {
                 (*drawpanel).borrow_mut().set_scale(scale - 0.1, 350., 300.);
             }
         });
-
+        let data = Rc::new(RefCell::new(String::from("")));
         export_btn.set_callback({
+            let data = Rc::clone(&data);
             let drawpanel = Rc::clone(&drawpanel);
             let mut win = win.clone();
             move |btn| {
-                println!("{}", (*drawpanel).borrow().export());
+                *data.borrow_mut() = (*drawpanel).borrow().export();
+                println!("export:{}", *data.borrow_mut());
+            }
+        });
+
+        import_btn.set_callback({
+            let drawpanel = Rc::clone(&drawpanel);
+            let data = Rc::clone(&data);
+            let mut win = win.clone();
+            move |btn| {
+                println!("import:{}", *data.borrow_mut());
+                (*drawpanel)
+                    .borrow_mut()
+                    .import((*data.borrow_mut()).as_str());
             }
         });
 
