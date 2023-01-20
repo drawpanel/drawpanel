@@ -1,26 +1,34 @@
-use std::os::macos::raw::stat;
-
 use crate::{
     binder::{Draw, DrawCircleOpts, DrawRectOpts},
     draw_wrap::DrawWrap,
 };
 
 use super::{Elem, IElem, Status};
+use educe::Educe;
 use geo::{coord, point, Coordinate, EuclideanDistance, Intersects, Point};
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Educe)]
+#[educe(Default)]
 pub struct Rect {
     pub lt_coord: Coordinate, // left top coord
     pub width: f64,
     pub height: f64,
+    #[educe(Default = 3)]
+    pub line_size: u32,
+    #[educe(Default = 0xff0000)]
+    pub line_color: u32,
+    pub fill_color: Option<u32>,
+    pub line_style: LineStyle,
 }
 
 impl IElem for Rect {}
 
 impl Elem for Rect {
     fn draw(&self, draw: &DrawWrap<'_>, status: Status) {
-        let line_color = 0xff0000;
-
+        let line_color = self.line_color;
+        let line_size = self.line_size;
+        let fill_color = self.fill_color;
+        let line_style = self.line_style.clone();
         let drag_coords = self.get_vertex();
 
         match status {
@@ -29,9 +37,10 @@ impl Elem for Rect {
                     left_top_coord: self.lt_coord,
                     width: self.width,
                     height: self.height,
-                    line_size: 5,
-                    line_color: line_color,
-                    fill_color: None,
+                    line_size: line_size + 2,
+                    line_color,
+                    fill_color,
+                    line_style,
                 });
 
                 let lt = drag_coords.get(0).unwrap();
@@ -40,28 +49,28 @@ impl Elem for Rect {
                 let bl = drag_coords.get(3).unwrap();
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *lt,
-                    r: 5.,
+                    r: line_size as f64 + 2.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *tr,
-                    r: 5.,
+                    r: line_size as f64 + 2.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *br,
-                    r: 5.,
+                    r: line_size as f64 + 2.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *bl,
-                    r: 5.,
+                    r: line_size as f64 + 2.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
@@ -72,9 +81,10 @@ impl Elem for Rect {
                     left_top_coord: self.lt_coord,
                     width: self.width,
                     height: self.height,
-                    line_size: 3,
-                    line_color: line_color,
-                    fill_color: None,
+                    line_size,
+                    line_color,
+                    fill_color,
+                    line_style,
                 });
 
                 let lt = drag_coords.get(0).unwrap();
@@ -83,28 +93,28 @@ impl Elem for Rect {
                 let bl = drag_coords.get(3).unwrap();
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *lt,
-                    r: 5.,
+                    r: line_size as f64 + 2.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *tr,
-                    r: 5.,
+                    r: line_size as f64 + 2.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *br,
-                    r: 5.,
+                    r: line_size as f64 + 2.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *bl,
-                    r: 5.,
+                    r: line_size as f64 + 2.,
                     line_size: 0,
                     line_color,
                     fill_color: 0,
@@ -115,9 +125,10 @@ impl Elem for Rect {
                     left_top_coord: self.lt_coord,
                     width: self.width,
                     height: self.height,
-                    line_size: 3,
-                    line_color: line_color,
-                    fill_color: None,
+                    line_size,
+                    line_color,
+                    fill_color,
+                    line_style,
                 });
             }
         }
@@ -246,4 +257,12 @@ impl Elem for Rect {
             ..Default::default()
         })
     }
+}
+
+#[derive(Debug, Clone, Educe)]
+#[educe(Default)]
+pub enum LineStyle {
+    #[educe(Default)]
+    Solid,
+    Dotted,
 }

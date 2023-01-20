@@ -5,7 +5,7 @@ use geo::Coordinate;
 
 use crate::{
     drawpanel::Drawpanel,
-    elem::{Elem, IElem},
+    elem::{rect::LineStyle, Elem, IElem},
     panel::Panel,
 };
 
@@ -48,6 +48,7 @@ pub struct DrawRectOpts {
     pub line_size: u32,
     pub line_color: u32,
     pub fill_color: Option<u32>,
+    pub line_style: LineStyle,
 }
 
 pub struct DrawCircleOpts {

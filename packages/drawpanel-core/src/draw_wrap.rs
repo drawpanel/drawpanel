@@ -39,6 +39,7 @@ impl Draw for DrawWrap<'_> {
             line_size: opts.line_size * (scale as u32),
             line_color: opts.line_color,
             fill_color: opts.fill_color,
+            line_style: opts.line_style,
         })
     }
 

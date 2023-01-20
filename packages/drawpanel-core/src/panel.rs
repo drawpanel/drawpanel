@@ -9,7 +9,10 @@ use crate::{
     },
     draw_wrap::DrawWrap,
     drawpanel::Mode,
-    elem::{line::Line, pen::Pen, rect::Rect, Elem, IElem, Status},
+    elem::{
+        rect::{LineStyle, Rect},
+        Elem, IElem, Status,
+    },
     serde_helper::{option_coordinate, CoordinateRef},
 };
 
@@ -98,9 +101,10 @@ impl Panel {
             left_top_coord: self.lt_coord,
             width: self.width * self.scale,
             height: self.height * self.scale,
-            line_size: 3,
-            line_color: 0x000000,
+            line_size: 0,
+            line_color: 0xffffff,
             fill_color: Some(0xffffff),
+            line_style: LineStyle::Solid,
         });
         let draw = DrawWrap::new(&draw, self);
         for (i, elem) in self.elems.iter().enumerate() {
@@ -217,7 +221,12 @@ impl Panel {
                     }
                     Mode::Select => {
                         self.selects.clear();
-                        self.select_box = Some(Rect::default());
+                        self.select_box = Some(Rect {
+                            line_color: 0x000000,
+                            line_size: 1,
+                            line_style: LineStyle::Dotted,
+                            ..Rect::default()
+                        });
                     }
                 }
             }

@@ -4,7 +4,7 @@ use crate::{
     serde_helper::CoordinateRef,
 };
 
-use super::{Elem, IElem, Status};
+use super::{rect::LineStyle, Elem, IElem, Status};
 use geo::{coord, point, Coordinate, EuclideanDistance, Intersects, Point};
 
 #[derive(Debug, Clone, Default)]
@@ -44,6 +44,7 @@ impl Elem for Text {
                     line_size: 3,
                     line_color: line_color,
                     fill_color: None,
+                    line_style: LineStyle::Solid,
                 });
                 draw.draw_text(DrawTextOpts {
                     left_top_coord: self.lt_coord,
@@ -97,6 +98,7 @@ impl Elem for Text {
                     line_size: 3,
                     line_color: line_color,
                     fill_color: None,
+                    line_style: LineStyle::Solid,
                 });
                 draw.draw_text(DrawTextOpts {
                     left_top_coord: self.lt_coord,
@@ -150,6 +152,7 @@ impl Elem for Text {
                     line_size: 3,
                     line_color: line_color,
                     fill_color: None,
+                    line_style: LineStyle::Solid,
                 });
                 draw.draw_text(DrawTextOpts {
                     left_top_coord: self.lt_coord,
