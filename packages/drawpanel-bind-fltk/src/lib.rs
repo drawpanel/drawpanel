@@ -167,6 +167,15 @@ impl Draw for FltkDraw {
             opts.width as i32,
             opts.height as i32,
         );
+        if let Some(fill_color) = opts.fill_color {
+            draw::draw_rect_fill(
+                opts.left_top_coord.x as i32,
+                opts.left_top_coord.y as i32,
+                opts.width as i32,
+                opts.height as i32,
+                Color::from_hex(fill_color),
+            );
+        }
     }
 
     fn draw_circle(&self, opts: DrawCircleOpts) {
