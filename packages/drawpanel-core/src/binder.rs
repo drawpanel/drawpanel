@@ -47,7 +47,7 @@ pub struct DrawRectOpts {
     pub height: f64,
     pub line_size: u32,
     pub line_color: u32,
-    pub fill_color: u32,
+    pub fill_color: Option<u32>,
 }
 
 pub struct DrawCircleOpts {

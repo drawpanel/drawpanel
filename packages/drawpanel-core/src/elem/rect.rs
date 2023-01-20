@@ -31,7 +31,7 @@ impl Elem for Rect {
                     height: self.height,
                     line_size: 5,
                     line_color: line_color,
-                    fill_color: 0,
+                    fill_color: None,
                 });
 
                 let lt = drag_coords.get(0).unwrap();
@@ -74,7 +74,7 @@ impl Elem for Rect {
                     height: self.height,
                     line_size: 3,
                     line_color: line_color,
-                    fill_color: 0,
+                    fill_color: None,
                 });
 
                 let lt = drag_coords.get(0).unwrap();
@@ -117,7 +117,7 @@ impl Elem for Rect {
                     height: self.height,
                     line_size: 3,
                     line_color: line_color,
-                    fill_color: 0,
+                    fill_color: None,
                 });
             }
         }

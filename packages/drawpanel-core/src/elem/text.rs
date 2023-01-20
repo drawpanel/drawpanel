@@ -43,7 +43,7 @@ impl Elem for Text {
                     height: self.height,
                     line_size: 3,
                     line_color: line_color,
-                    fill_color: 0,
+                    fill_color: None,
                 });
                 draw.draw_text(DrawTextOpts {
                     left_top_coord: self.lt_coord,
@@ -96,7 +96,7 @@ impl Elem for Text {
                     height: self.height,
                     line_size: 3,
                     line_color: line_color,
-                    fill_color: 0,
+                    fill_color: None,
                 });
                 draw.draw_text(DrawTextOpts {
                     left_top_coord: self.lt_coord,
@@ -149,7 +149,7 @@ impl Elem for Text {
                     height: self.height,
                     line_size: 3,
                     line_color: line_color,
-                    fill_color: 0,
+                    fill_color: None,
                 });
                 draw.draw_text(DrawTextOpts {
                     left_top_coord: self.lt_coord,

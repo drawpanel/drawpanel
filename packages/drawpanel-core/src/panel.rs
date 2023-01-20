@@ -100,7 +100,7 @@ impl Panel {
             height: self.height * self.scale,
             line_size: 3,
             line_color: 0x000000,
-            fill_color: 0,
+            fill_color: Some(0xffffff),
         });
         let draw = DrawWrap::new(&draw, self);
         for (i, elem) in self.elems.iter().enumerate() {
