@@ -160,7 +160,13 @@ impl Draw for FltkDraw {
 
     fn draw_rect(&self, opts: DrawRectOpts) {
         draw::set_draw_color(Color::from_hex(opts.line_color));
-        draw::set_line_style(LineStyle::Solid, opts.line_size as i32);
+        draw::set_line_style(
+            match opts.line_style {
+                drawpanel_core::elem::rect::LineStyle::Solid => LineStyle::Solid,
+                drawpanel_core::elem::rect::LineStyle::Dotted => LineStyle::Dot,
+            },
+            opts.line_size as i32,
+        );
         draw::draw_rect(
             opts.left_top_coord.x as i32,
             opts.left_top_coord.y as i32,
