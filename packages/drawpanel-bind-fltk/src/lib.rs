@@ -42,6 +42,11 @@ impl FltkBinder {
                     frame.redraw();
                     true
                 }
+                Event::Push => {
+                    inp.redraw();
+                    frame.redraw();
+                    true
+                }
                 _ => false,
             }
         });
