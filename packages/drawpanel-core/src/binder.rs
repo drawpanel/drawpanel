@@ -24,6 +24,7 @@ pub enum EventMouseButton {
     Right,
 }
 
+#[derive(Debug)]
 pub enum EventType {
     Move(EventMouseButton),
     Push(EventMouseButton), // Click, Dblclick, Mouseup(Left\Right\Mid), Mousedown
