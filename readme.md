@@ -20,8 +20,8 @@ A drawing engine written in rust.
 
 ```shell
 git clone https://github.com/drawpanel/drawpanel
-cd drawpanel/packages/drawpanel
-cargo run
+cd drawpanel
+cargo run --package=drawpanel # cargo watch -x 'run' -w ../drawpanel
 ```
 
 ### Contribute

@@ -18,8 +18,8 @@
 
 ```shell
 git clone https://github.com/drawpanel/drawpanel
-cd drawpanel/packages/drawpanel
-cargo run
+cd drawpanel
+cargo run --package=drawpanel # cargo watch -x 'run' -w ../drawpanel
 ```
 
 ### 贡献
