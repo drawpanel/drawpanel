@@ -21,11 +21,20 @@ struct AppView {
 impl AppView {
     fn new() -> Self {
         let app = app::App::default().with_scheme(Scheme::Base);
-        let mut win = window::Window::default().with_size(700, 600);
+        let mut win = window::Window::default().with_size(1200, 800);
 
-        let mut root_panel = group::Flex::new(0, 0, 700, 600, None).row();
+        let mut root_panel = group::Flex::new(0, 0, 1200, 800, None).column();
 
-        let mut left_panel = group::Flex::default().column();
+        let mut top_panel = group::Flex::default().column();
+
+        let mut draw_frm = frame::Frame::default();
+        draw_frm.set_frame(FrameType::FlatBox);
+        draw_frm.set_color(Color::from_hex(0xc1c0c0));
+
+        top_panel.set_pad(0);
+        top_panel.end();
+
+        let mut bottom_panel = group::Flex::default().row();
         let mut select_btn = button::Button::default().with_label("Select");
         let mut pen_btn = button::Button::default().with_label("Pen");
         let mut line_btn = button::Button::default().with_label("Line");
@@ -36,36 +45,12 @@ impl AppView {
         let mut down_scale_btn = button::Button::default().with_label("Down");
         let mut export_btn = button::Button::default().with_label("Export");
         let mut import_btn = button::Button::default().with_label("Import");
-        let mut status_frm = frame::Frame::default();
-
-        left_panel.set_size(&status_frm, 200);
-        left_panel.set_pad(0);
-        left_panel.end();
-
-        let mut mid_panel = group::Flex::default().column();
-        let mut elem_change_panel = group::Flex::default().row();
-
-        elem_change_panel.set_pad(0);
-        elem_change_panel.end();
-        let mut draw_frm = frame::Frame::default();
-        draw_frm.set_frame(FrameType::FlatBox);
-        draw_frm.set_color(Color::White);
-
-        mid_panel.set_pad(0);
-        mid_panel.set_size(&elem_change_panel, 50);
-        mid_panel.set_size(&draw_frm, 500);
-        mid_panel.end();
-
-        let mut right_panel = group::Flex::default().column();
-        let mut tree_frm = frame::Frame::default();
-        right_panel.set_size(&tree_frm, 400);
-        right_panel.set_pad(0);
-        right_panel.end();
+        bottom_panel.set_pad(0);
+        bottom_panel.end();
 
         root_panel.set_pad(0);
-        root_panel.set_size(&left_panel, 100);
-        root_panel.set_size(&mid_panel, 500);
-        root_panel.set_size(&right_panel, 100);
+        root_panel.set_size(&top_panel, 700);
+        root_panel.set_size(&bottom_panel, 100);
         root_panel.end();
 
         win.end();
