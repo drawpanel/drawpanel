@@ -37,17 +37,11 @@ impl FltkBinder {
         input.handle({
             let mut frame = frame.clone();
             move |inp, e| match e {
-                Event::KeyDown => {
+                _ => {
                     inp.redraw();
                     frame.redraw();
-                    true
+                    false
                 }
-                Event::Push => {
-                    inp.redraw();
-                    frame.redraw();
-                    true
-                }
-                _ => false,
             }
         });
 
