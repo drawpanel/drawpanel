@@ -139,6 +139,18 @@ impl Binder for FltkBinder {
             frame: self.frame.clone(),
         })
     }
+    fn region(&self) -> geo::Rect<f64> {
+        geo::Rect::new(
+            geo::Coordinate {
+                x: self.frame.x() as f64,
+                y: self.frame.y() as f64,
+            },
+            geo::Coordinate {
+                x: (self.frame.x() + self.frame.width()) as f64,
+                y: (self.frame.y() + self.frame.height()) as f64,
+            },
+        )
+    }
 }
 
 #[derive(Debug)]
