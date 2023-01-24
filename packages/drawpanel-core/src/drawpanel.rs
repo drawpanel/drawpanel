@@ -25,8 +25,6 @@ impl Drawpanel {
         let region = binder.region();
         let drawpanel = Drawpanel {
             panel: Rc::new(RefCell::new(Panel::new(
-                binder.draw(),
-                binder.hook_event(),
                 region.min().x,
                 region.min().y,
                 region.width(),
@@ -41,13 +39,20 @@ impl Drawpanel {
         };
 
         binder.init(drawpanel.panel.clone());
+        drawpanel.panel.borrow_mut().set_draw(binder.draw());
+        drawpanel
+            .panel
+            .borrow_mut()
+            .set_hook_event(binder.hook_event());
 
         drawpanel
     }
 
     pub fn flush(&mut self) {
-        let mut panel = (*self.panel).borrow_mut();
-        panel.hook_event.flush();
+        let mut panel = self.panel.borrow_mut();
+        if let Some(hook_event) = &mut panel.hook_event {
+            hook_event.flush();
+        }
     }
 
     pub fn set_scale(&mut self, val: f64, x: f64, y: f64) {
@@ -91,5 +96,9 @@ impl Drawpanel {
     pub fn import(&mut self, data: &str) {
         let mut panel = (*self.panel).borrow_mut();
         panel.import(data);
+    }
+
+    pub fn panel(&self) -> Rc<RefCell<Panel>> {
+        self.panel.clone()
     }
 }

@@ -41,9 +41,9 @@ pub struct Panel {
     // #[serde(with = "CoordinateRef")]
     pub raw_prev_coord: Coordinate,
     // #[serde(skip)]
-    pub draw: Box<dyn IDraw>,
+    pub draw: Option<Box<dyn IDraw>>,
     // #[serde(skip)]
-    pub hook_event: Box<dyn IHookEvent>,
+    pub hook_event: Option<Box<dyn IHookEvent>>,
     pub select_box: Option<Rect>,
     pub selects: HashSet<u32>,
     pub event_flag: i32,
@@ -57,15 +57,7 @@ pub struct PanelSerialize {
 }
 
 impl Panel {
-    pub fn new(
-        draw: Box<dyn IDraw>,
-        hook_event: Box<dyn IHookEvent>,
-        x: f64,
-        y: f64,
-        w: f64,
-        h: f64,
-        register_elem: Vec<Box<dyn IElem>>,
-    ) -> Panel {
+    pub fn new(x: f64, y: f64, w: f64, h: f64, register_elem: Vec<Box<dyn IElem>>) -> Panel {
         let mut register_elem_map: Map<String, Box<dyn IElem>> = Map::new();
 
         for elem in register_elem {
@@ -84,8 +76,8 @@ impl Panel {
             prev_coord: coord! { x: 0., y:0. },
             raw_prev_coord: coord! { x: 0., y:0. },
             elems: vec![],
-            draw,
-            hook_event,
+            draw: None,
+            hook_event: None,
 
             select_box: None,
             selects: HashSet::new(),
@@ -95,8 +87,16 @@ impl Panel {
         }
     }
 
+    pub fn set_draw(&mut self, draw: Box<dyn IDraw>) {
+        self.draw = Some(draw);
+    }
+
+    pub fn set_hook_event(&mut self, hook_event: Box<dyn IHookEvent>) {
+        self.hook_event = Some(hook_event);
+    }
+
     pub fn trigger_draw(&self) {
-        let draw = &self.draw;
+        let draw = &self.draw.as_ref().unwrap();
         draw.draw_rect(DrawRectOpts {
             left_top_coord: self.lt_coord,
             width: self.width * self.scale,
@@ -185,11 +185,17 @@ impl Panel {
                     }
                     Mode::Creating(elem) => {
                         if let Some(elem) = elem.take() {
-                            self.hook_event.begin_create(&elem, relative_coord);
+                            self.hook_event
+                                .as_mut()
+                                .unwrap()
+                                .begin_create(&elem, relative_coord);
                             self.elems.push(elem);
                         } else {
                             let elem = self.elems.last_mut();
-                            self.hook_event.end_create(elem.unwrap(), relative_coord);
+                            self.hook_event
+                                .as_mut()
+                                .unwrap()
+                                .end_create(elem.unwrap(), relative_coord);
                             self.mode = Mode::EditMoving;
                         }
                     }
@@ -209,7 +215,7 @@ impl Panel {
 
                                 self.selects.clear();
                                 self.select_box = None;
-                                self.hook_event.flush();
+                                self.flush();
                             }
                         }
                     }
@@ -217,6 +223,8 @@ impl Panel {
                         let elem = self.elems.last_mut();
                         self.mode = Mode::EditMoving;
                         self.hook_event
+                            .as_mut()
+                            .unwrap()
                             .end_edit_state(elem.unwrap(), relative_coord);
                     }
                     Mode::Select => {
@@ -238,8 +246,14 @@ impl Panel {
                         let vec = elem.get_vertex();
                         let event_rect = self.calc_event_rect(vec);
                         let elem = self.elems.last_mut().unwrap();
-                        self.hook_event.end_create(elem, relative_coord);
-                        self.hook_event.begin_edit_state(elem, event_rect);
+                        self.hook_event
+                            .as_mut()
+                            .unwrap()
+                            .end_create(elem, relative_coord);
+                        self.hook_event
+                            .as_mut()
+                            .unwrap()
+                            .begin_edit_state(elem, event_rect);
                         self.mode = Mode::EditState;
                     }
                 }
@@ -274,7 +288,10 @@ impl Panel {
                     let top = self.elems.last_mut();
                     if let Some(elem) = top {
                         elem.creating(self.prev_coord, relative_coord);
-                        self.hook_event.doing_create(elem, relative_coord);
+                        self.hook_event
+                            .as_mut()
+                            .unwrap()
+                            .doing_create(elem, relative_coord);
                     }
                 }
                 Mode::EditMoving => {
@@ -328,7 +345,10 @@ impl Panel {
 
                     let elem = self.elems.get_mut(idx as usize).unwrap();
                     self.mode = Mode::EditState;
-                    self.hook_event.begin_edit_state(elem, event_rect);
+                    self.hook_event
+                        .as_mut()
+                        .unwrap()
+                        .begin_edit_state(elem, event_rect);
                 }
             }
             EventType::Zoom(zoom) => match zoom {
@@ -341,7 +361,7 @@ impl Panel {
                 }
             },
         };
-        self.hook_event.flush();
+        self.flush();
     }
 
     fn calc_event_rect(&self, ver: Vec<Coordinate>) -> EventRect {
@@ -364,7 +384,7 @@ impl Panel {
 
         self.scale = val;
 
-        self.hook_event.flush();
+        self.flush();
     }
 
     pub fn scale(&self) -> f64 {
@@ -418,6 +438,19 @@ impl Panel {
         }
 
         self.elems = elems;
-        self.hook_event.flush();
+        self.flush();
+    }
+
+    pub fn set_region(&mut self, region: geo::Rect) {
+        self.raw_lt_coord = region.min();
+        self.lt_coord = region.min();
+        self.width = region.width();
+        self.height = region.height();
+        self.flush();
+    }
+
+    pub fn flush(&mut self) {
+        let hook_event = self.hook_event.as_mut().unwrap();
+        hook_event.flush();
     }
 }
