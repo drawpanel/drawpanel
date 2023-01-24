@@ -21,15 +21,16 @@ pub struct Drawpanel {
 }
 
 impl Drawpanel {
-    pub fn new(mut binder: impl Binder, x: f64, y: f64, w: f64, h: f64) -> Self {
+    pub fn new(mut binder: impl Binder) -> Self {
+        let region = binder.region();
         let drawpanel = Drawpanel {
             panel: Rc::new(RefCell::new(Panel::new(
                 binder.draw(),
                 binder.hook_event(),
-                x,
-                y,
-                w,
-                h,
+                region.min().x,
+                region.min().y,
+                region.width(),
+                region.height(),
                 vec![
                     Box::new(elem::pen::Pen::default()) as Box<dyn IElem>,
                     Box::new(elem::line::Line::default()) as Box<dyn IElem>,

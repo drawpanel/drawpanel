@@ -73,6 +73,7 @@ pub trait Binder {
     fn init(&mut self, panel: Rc<RefCell<Panel>>);
     fn draw(&self) -> Box<dyn IDraw>;
     fn hook_event(&self) -> Box<dyn IHookEvent>;
+    fn region(&self) -> geo::Rect<f64>;
 }
 
 pub trait IDraw: Draw + Debug {}
