@@ -24,6 +24,19 @@ cd drawpanel
 cargo run --package=drawpanel # cargo watch -x 'run' -w ../drawpanel
 ```
 
+## Example
+
+> Run Example:
+
+```shell
+cargo run --example=app -p drawpanel-bind-fltk
+cargo run --example=app -p drawpanel-bind-egui
+```
+
+### Egui
+
+[Demo video](packages/drawpanel-bind-egui/readme.md)
+
 ### Contribute
 
 It can be directly conducted through PR.
