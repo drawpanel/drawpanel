@@ -23,7 +23,7 @@ impl Draw for DrawWrap<'_> {
         self.draw.draw_line(DrawLineOpts {
             from_coord,
             end_coord,
-            line_size: opts.line_size * (scale as u32),
+            line_size: opts.line_size * scale,
             line_color: opts.line_color,
         });
     }
@@ -36,7 +36,7 @@ impl Draw for DrawWrap<'_> {
             left_top_coord,
             width: opts.width * scale,
             height: opts.height * scale,
-            line_size: opts.line_size * (scale as u32),
+            line_size: opts.line_size * scale,
             line_color: opts.line_color,
             fill_color: opts.fill_color,
             line_style: opts.line_style,
@@ -48,7 +48,7 @@ impl Draw for DrawWrap<'_> {
         let center_coord = self.panel.absolute_coord(opts.center_coord);
 
         self.draw.draw_circle(DrawCircleOpts {
-            line_size: opts.line_size * (scale as u32),
+            line_size: opts.line_size * scale,
             line_color: opts.line_color,
             fill_color: opts.fill_color,
             center_coord,

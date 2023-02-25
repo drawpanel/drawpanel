@@ -26,20 +26,20 @@ impl Elem for Line {
                 draw.draw_line(DrawLineOpts {
                     from_coord: self.from_coord,
                     end_coord: self.end_coord,
-                    line_size: 5,
+                    line_size: 5.,
                     line_color,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: self.from_coord,
                     r: 5.,
-                    line_size: 1,
+                    line_size: 1.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: self.end_coord,
                     r: 5.,
-                    line_size: 1,
+                    line_size: 1.,
                     line_color,
                     fill_color: 0,
                 });
@@ -48,21 +48,21 @@ impl Elem for Line {
                 draw.draw_line(DrawLineOpts {
                     from_coord: self.from_coord,
                     end_coord: self.end_coord,
-                    line_size: 3,
+                    line_size: 3.,
                     line_color,
                 });
 
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: self.from_coord,
                     r: 5.,
-                    line_size: 1,
+                    line_size: 1.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: self.end_coord,
                     r: 5.,
-                    line_size: 1,
+                    line_size: 1.,
                     line_color,
                     fill_color: 0,
                 });
@@ -71,7 +71,7 @@ impl Elem for Line {
                 draw.draw_line(DrawLineOpts {
                     from_coord: self.from_coord,
                     end_coord: self.end_coord,
-                    line_size: 3,
+                    line_size: 3.,
                     line_color,
                 });
             }

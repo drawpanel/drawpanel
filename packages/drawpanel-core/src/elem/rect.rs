@@ -13,8 +13,8 @@ pub struct Rect {
     pub lt_coord: Coordinate, // left top coord
     pub width: f64,
     pub height: f64,
-    #[educe(Default = 3)]
-    pub line_size: u32,
+    #[educe(Default = 3.)]
+    pub line_size: f64,
     #[educe(Default = 0xff0000)]
     pub line_color: u32,
     pub fill_color: Option<u32>,
@@ -37,7 +37,7 @@ impl Elem for Rect {
                     left_top_coord: self.lt_coord,
                     width: self.width,
                     height: self.height,
-                    line_size: line_size + 2,
+                    line_size: line_size + 2.,
                     line_color,
                     fill_color,
                     line_style,
@@ -50,28 +50,28 @@ impl Elem for Rect {
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *lt,
                     r: line_size as f64 + 2.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *tr,
                     r: line_size as f64 + 2.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *br,
                     r: line_size as f64 + 2.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *bl,
                     r: line_size as f64 + 2.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
@@ -94,28 +94,28 @@ impl Elem for Rect {
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *lt,
                     r: line_size as f64 + 2.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *tr,
                     r: line_size as f64 + 2.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *br,
                     r: line_size as f64 + 2.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *bl,
                     r: line_size as f64 + 2.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });

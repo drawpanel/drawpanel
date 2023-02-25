@@ -41,7 +41,7 @@ impl Elem for Text {
                     left_top_coord: self.lt_coord,
                     width: self.width,
                     height: self.height,
-                    line_size: 3,
+                    line_size: 3.,
                     line_color: line_color,
                     fill_color: None,
                     line_style: LineStyle::Solid,
@@ -64,28 +64,28 @@ impl Elem for Text {
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *lt,
                     r: 5.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *tr,
                     r: 5.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *br,
                     r: 5.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *bl,
                     r: 5.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
@@ -95,7 +95,7 @@ impl Elem for Text {
                     left_top_coord: self.lt_coord,
                     width: self.width,
                     height: self.height,
-                    line_size: 3,
+                    line_size: 3.,
                     line_color: line_color,
                     fill_color: None,
                     line_style: LineStyle::Solid,
@@ -118,28 +118,28 @@ impl Elem for Text {
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *lt,
                     r: 5.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *tr,
                     r: 5.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *br,
                     r: 5.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
                 draw.draw_circle(DrawCircleOpts {
                     center_coord: *bl,
                     r: 5.,
-                    line_size: 0,
+                    line_size: 0.,
                     line_color,
                     fill_color: 0,
                 });
@@ -149,7 +149,7 @@ impl Elem for Text {
                     left_top_coord: self.lt_coord,
                     width: self.width,
                     height: self.height,
-                    line_size: 3,
+                    line_size: 3.,
                     line_color: line_color,
                     fill_color: None,
                     line_style: LineStyle::Solid,

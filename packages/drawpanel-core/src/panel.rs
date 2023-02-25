@@ -103,7 +103,7 @@ impl Panel {
             left_top_coord: self.lt_coord,
             width: self.width * self.scale,
             height: self.height * self.scale,
-            line_size: 0,
+            line_size: 0.,
             line_color: 0xffffff,
             fill_color: Some(0xffffff),
             line_style: LineStyle::Solid,
@@ -239,7 +239,7 @@ impl Panel {
                         self.selects.clear();
                         self.select_box = Some(Rect {
                             line_color: 0x000000,
-                            line_size: 1,
+                            line_size: 1.,
                             line_style: LineStyle::Dotted,
                             ..Rect::default()
                         });

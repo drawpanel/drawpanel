@@ -37,7 +37,7 @@ pub enum EventType {
 pub struct DrawLineOpts {
     pub from_coord: Coordinate,
     pub end_coord: Coordinate,
-    pub line_size: u32,
+    pub line_size: f64,
     pub line_color: u32,
 }
 
@@ -45,7 +45,7 @@ pub struct DrawRectOpts {
     pub left_top_coord: Coordinate,
     pub width: f64,
     pub height: f64,
-    pub line_size: u32,
+    pub line_size: f64,
     pub line_color: u32,
     pub fill_color: Option<u32>,
     pub line_style: LineStyle,
@@ -54,7 +54,7 @@ pub struct DrawRectOpts {
 pub struct DrawCircleOpts {
     pub center_coord: Coordinate,
     pub r: f64,
-    pub line_size: u32,
+    pub line_size: f64,
     pub line_color: u32,
     pub fill_color: u32,
 }
