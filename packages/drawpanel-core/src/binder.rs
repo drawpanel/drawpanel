@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::{any::Any, fmt::Debug, rc::Weak};
 use std::{cell::RefCell, rc::Rc};
 
 use geo::Coordinate;
@@ -70,8 +70,8 @@ pub struct DrawTextOpts<'a> {
 }
 
 pub trait Binder {
-    fn init(&mut self, panel: Rc<RefCell<Panel>>);
-    fn draw(&self) -> Box<dyn IDraw>;
+    fn init(&mut self, panel: Weak<RefCell<Panel>>);
+    fn draw(&self, panel: Weak<RefCell<Panel>>) -> Box<dyn IDraw>;
     fn hook_event(&self) -> Box<dyn IHookEvent>;
     fn region(&self) -> geo::Rect<f64>;
 }

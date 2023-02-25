@@ -1,4 +1,8 @@
-use std::{cell::RefCell, collections::HashSet, rc::Rc};
+use std::{
+    cell::RefCell,
+    collections::HashSet,
+    rc::{Rc, Weak},
+};
 
 use crate::{
     binder::Binder,
@@ -23,23 +27,27 @@ pub struct Drawpanel {
 impl Drawpanel {
     pub fn new(mut binder: impl Binder) -> Self {
         let region = binder.region();
+        let panel = Rc::new(RefCell::new(Panel::new(
+            region.min().x,
+            region.min().y,
+            region.width(),
+            region.height(),
+            vec![
+                Box::new(elem::pen::Pen::default()) as Box<dyn IElem>,
+                Box::new(elem::line::Line::default()) as Box<dyn IElem>,
+                Box::new(elem::rect::Rect::default()) as Box<dyn IElem>,
+                Box::new(elem::text::Text::default()) as Box<dyn IElem>,
+            ],
+        )));
         let drawpanel = Drawpanel {
-            panel: Rc::new(RefCell::new(Panel::new(
-                region.min().x,
-                region.min().y,
-                region.width(),
-                region.height(),
-                vec![
-                    Box::new(elem::pen::Pen::default()) as Box<dyn IElem>,
-                    Box::new(elem::line::Line::default()) as Box<dyn IElem>,
-                    Box::new(elem::rect::Rect::default()) as Box<dyn IElem>,
-                    Box::new(elem::text::Text::default()) as Box<dyn IElem>,
-                ],
-            ))),
+            panel: panel.clone(),
         };
 
-        binder.init(drawpanel.panel.clone());
-        drawpanel.panel.borrow_mut().set_draw(binder.draw());
+        binder.init(Rc::downgrade(&panel));
+        drawpanel
+            .panel
+            .borrow_mut()
+            .set_draw(binder.draw(Rc::downgrade(&panel)));
         drawpanel
             .panel
             .borrow_mut()
@@ -98,7 +106,7 @@ impl Drawpanel {
         panel.import(data);
     }
 
-    pub fn panel(&self) -> Rc<RefCell<Panel>> {
-        self.panel.clone()
+    pub fn panel(&self) -> Weak<RefCell<Panel>> {
+        Rc::downgrade(&self.panel)
     }
 }

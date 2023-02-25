@@ -1,5 +1,5 @@
-use std::fmt::Debug;
 use std::{cell::RefCell, rc::Rc};
+use std::{fmt::Debug, rc::Weak};
 
 use drawpanel_core::{
     binder::{
@@ -54,9 +54,9 @@ impl FltkBinder {
 }
 
 impl Binder for FltkBinder {
-    fn init(&mut self, panel: Rc<RefCell<Panel>>) {
+    fn init(&mut self, panel: Weak<RefCell<Panel>>) {
         self.frame.draw({
-            let drawpanel = Rc::clone(&panel);
+            let drawpanel = panel.upgrade().unwrap();
             move |frm| {
                 (*drawpanel).borrow_mut().trigger_draw();
             }
@@ -64,7 +64,7 @@ impl Binder for FltkBinder {
 
         self.frame.handle({
             let mut input = self.input.clone();
-            let drawpanel = Rc::clone(&panel);
+            let drawpanel = panel.upgrade().unwrap();
             move |frm, e| {
                 let (x, y) = app::event_coords();
                 let is_double = app::event_clicks();
@@ -129,7 +129,7 @@ impl Binder for FltkBinder {
         // self.panel = Some(panel.clone());
     }
 
-    fn draw(&self) -> Box<dyn IDraw> {
+    fn draw(&self, panel: Weak<RefCell<Panel>>) -> Box<dyn IDraw> {
         Box::new(FltkDraw)
     }
 

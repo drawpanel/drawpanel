@@ -1,5 +1,6 @@
 use std::{
-    borrow::BorrowMut, cell::RefCell, collections::HashSet, fmt::Debug, rc::Rc, time::Instant,
+    any::Any, borrow::BorrowMut, cell::RefCell, collections::HashSet, fmt::Debug, rc::Rc,
+    time::Instant,
 };
 
 use crate::{
@@ -453,4 +454,9 @@ impl Panel {
         let hook_event = self.hook_event.as_mut().unwrap();
         hook_event.flush();
     }
+
+    // pub fn update(&mut self, ctx: Box<dyn Any>) {
+    //     let draw = self.draw.as_mut().unwrap();
+    //     draw.update(ctx);
+    // }
 }
