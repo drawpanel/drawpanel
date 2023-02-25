@@ -96,8 +96,9 @@ impl Panel {
         self.hook_event = Some(hook_event);
     }
 
-    pub fn trigger_draw(&self) {
+    pub fn trigger_draw(&self) -> Box<dyn std::any::Any> {
         let draw = &self.draw.as_ref().unwrap();
+        draw.draw_begin();
         draw.draw_rect(DrawRectOpts {
             left_top_coord: self.lt_coord,
             width: self.width * self.scale,
@@ -107,10 +108,10 @@ impl Panel {
             fill_color: Some(0xffffff),
             line_style: LineStyle::Solid,
         });
-        let draw = DrawWrap::new(&draw, self);
+        let draw2 = DrawWrap::new(&draw, self);
         for (i, elem) in self.elems.iter().enumerate() {
             elem.draw(
-                &draw,
+                &draw2,
                 if i == (self.hover_index as usize) {
                     if let Mode::EditResizing(darg_point_index) = self.mode {
                         Status::Resizing(darg_point_index)
@@ -127,8 +128,9 @@ impl Panel {
             );
         }
         if let Some(select_box) = &self.select_box {
-            select_box.draw(&draw, Status::Creating)
+            select_box.draw(&draw2, Status::Creating)
         }
+        return draw.draw_end();
     }
 
     pub fn trigger_event(&mut self, event_type: EventType, inp_mouse_coord: Coordinate) {
@@ -136,7 +138,12 @@ impl Panel {
         let mouse_point = point!(relative_coord);
         let hover_index = &mut self.hover_index;
         let drag_vertex = &mut self.drag_vertex;
-
+        // println!(
+        //     "[DEBUG] mode: {:?}, event_type: {:?}, mouse_point: {:?}",
+        //     self.mode,
+        //     event_type,
+        //     (mouse_point.0.x, mouse_point.0.y)
+        // );
         match event_type {
             EventType::Move(_) => {
                 if let Mode::EditState = self.mode {

@@ -79,10 +79,14 @@ pub trait Binder {
 pub trait IDraw: Draw + Debug {}
 
 pub trait Draw {
+    fn draw_begin(&self) {}
     fn draw_line(&self, opts: DrawLineOpts);
     fn draw_rect(&self, opts: DrawRectOpts);
     fn draw_circle(&self, opts: DrawCircleOpts);
     fn draw_text(&self, opts: DrawTextOpts);
+    fn draw_end(&self) -> Box<dyn std::any::Any> {
+        Box::new(())
+    }
 }
 
 pub trait IHookEvent: HookEvent + Debug {}
