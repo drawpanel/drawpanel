@@ -2,7 +2,7 @@ use std::{any::Any, borrow::Borrow, cell::RefCell, rc::Rc};
 
 use drawpanel_bind_egui::EguiBinder;
 use drawpanel_core::{
-    binder::{EventMouseButton, EventType},
+    binder::{EventMouseButton, EventType, EventZoom},
     drawpanel::{Drawpanel, Mode},
 };
 use eframe::emath;
@@ -66,6 +66,13 @@ impl eframe::App for TemplateApp {
                         println!("Line");
                         ui.close_menu();
                     }
+                    if ui.button("Rect").clicked() {
+                        self.drawpanel.set_mode(Mode::Creating(Some(Box::new(
+                            drawpanel_core::elem::rect::Rect::default(),
+                        ))));
+                        println!("Rect");
+                        ui.close_menu();
+                    }
                 });
             });
         });
@@ -124,7 +131,24 @@ impl eframe::App for TemplateApp {
                         },
                     );
                 }
-
+                if let Some(pointer_pos) = response.hover_pos() {
+                    ui.ctx().input().events.iter().for_each(|event| {
+                        if let egui::Event::Scroll(v) = event {
+                            panel.trigger_event(
+                                EventType::Zoom(if v.y > 0.0 {
+                                    EventZoom::Grow
+                                } else {
+                                    EventZoom::Dwindle
+                                }),
+                                coord! {
+                                    x: pointer_pos.x as f64,
+                                    y: pointer_pos.y as f64
+                                },
+                            );
+                        }
+                    });
+                }
+                // 绘图
                 let shapes: Box<RefCell<Option<Vec<egui::Shape>>>> =
                     panel.trigger_draw().downcast().unwrap();
                 if let Some(shapes) = shapes.borrow_mut().as_mut() {

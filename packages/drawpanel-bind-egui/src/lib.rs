@@ -53,12 +53,13 @@ impl Draw for EguiDraw {
     fn draw_begin(&self) {
         let mut shapes = self.shapes.borrow_mut();
         *shapes = Some(Vec::new());
-        println!("[DEBUG] draw_begin {:?}", self.shapes);
+        // println!("[DEBUG] draw_begin {:?}", self.shapes);
     }
     fn draw_line(&self, opts: DrawLineOpts) {
         let mut shapes = self.shapes.borrow_mut();
 
         if let Some(shapes) = shapes.as_mut() {
+            println!("draw_line {:?}", opts.line_size);
             shapes.push(egui::Shape::line(
                 vec![
                     Pos2::new(opts.from_coord.x as f32, opts.from_coord.y as f32),
@@ -69,9 +70,33 @@ impl Draw for EguiDraw {
         }
     }
 
-    fn draw_rect(&self, opts: DrawRectOpts) {}
+    fn draw_rect(&self, opts: DrawRectOpts) {
+        let mut shapes = self.shapes.borrow_mut();
 
-    fn draw_circle(&self, opts: DrawCircleOpts) {}
+        if let Some(shapes) = shapes.as_mut() {
+            shapes.push(egui::Shape::rect_stroke(
+                egui::Rect::from_min_size(
+                    Pos2::new(opts.left_top_coord.x as f32, opts.left_top_coord.y as f32),
+                    egui::Vec2::new(opts.width as f32, opts.height as f32),
+                ),
+                egui::Rounding::default(),
+                egui::Stroke::new(opts.line_size as f32, egui::Color32::RED),
+            ));
+        }
+    }
+
+    fn draw_circle(&self, opts: DrawCircleOpts) {
+        let mut shapes = self.shapes.borrow_mut();
+
+        if let Some(shapes) = shapes.as_mut() {
+            shapes.push(egui::Shape::circle_filled(
+                Pos2::new(opts.center_coord.x as f32, opts.center_coord.y as f32),
+                opts.r as f32,
+                egui::Color32::RED,
+                // egui::Stroke::new(opts.line_size as f32, egui::Color32::RED),
+            ));
+        }
+    }
 
     fn draw_text(&self, opts: drawpanel_core::binder::DrawTextOpts) {}
 
@@ -86,7 +111,7 @@ impl Draw for EguiDraw {
     //     // ));
     // }
     fn draw_end(&self) -> Box<dyn std::any::Any> {
-        println!("[DEBUG] draw_end");
+        // println!("[DEBUG] draw_end");
         return Box::new(self.shapes.clone());
     }
 }
