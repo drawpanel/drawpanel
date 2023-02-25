@@ -22,6 +22,13 @@ cd drawpanel
 cargo run --package=drawpanel # cargo watch -x 'run' -w ../drawpanel
 ```
 
+## 运行 example
+
+```shell
+cargo run --example=app -p drawpanel-bind-fltk
+cargo run --example=app -p drawpanel-bind-egui
+```
+
 ### 贡献
 
 可以直接通过 PR 进行，目前规范正在完善中。
