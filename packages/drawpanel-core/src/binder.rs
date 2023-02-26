@@ -122,8 +122,15 @@ pub trait HookEvent {
     ) {
     }
     fn flush(&mut self) {}
+
+    fn get_state(&self) -> Box<dyn Any> {
+        Box::new(())
+    }
+
+    fn set_state(&mut self, state: Box<dyn std::any::Any>) {}
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct EventRect {
     pub coord: Coordinate,
     pub width: f64,
