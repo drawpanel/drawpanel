@@ -64,7 +64,7 @@ pub struct DrawTextOpts<'a> {
     pub width: f64,
     pub height: f64,
     pub content: &'a str,
-    pub font_size: u32,
+    pub font_size: f64,
     pub font_space: u32,
     pub font_color: u32,
 }

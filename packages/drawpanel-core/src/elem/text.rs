@@ -30,8 +30,7 @@ impl Elem for Text {
                     width: self.width,
                     height: self.height,
                     content: &self.content,
-                    font_size: (((self.height - 10.) as usize) / calc_string_lines(&self.content))
-                        as u32,
+                    font_size: ((self.height - 10.) / calc_string_lines(&self.content) as f64),
                     font_space: 0,
                     font_color: 0,
                 });
@@ -51,8 +50,7 @@ impl Elem for Text {
                     width: self.width,
                     height: self.height,
                     content: &self.content,
-                    font_size: (((self.height - 10.) as usize) / calc_string_lines(&self.content))
-                        as u32,
+                    font_size: ((self.height - 10.) / calc_string_lines(&self.content) as f64),
                     font_space: 0,
                     font_color: 0,
                 });
@@ -105,8 +103,7 @@ impl Elem for Text {
                     width: self.width,
                     height: self.height,
                     content: &self.content,
-                    font_size: (((self.height - 10.) as usize) / calc_string_lines(&self.content))
-                        as u32,
+                    font_size: ((self.height - 10.) / calc_string_lines(&self.content) as f64),
                     font_space: 0,
                     font_color: 0,
                 });
@@ -159,8 +156,7 @@ impl Elem for Text {
                     width: self.width,
                     height: self.height,
                     content: &self.content,
-                    font_size: (((self.height - 10.) as usize) / calc_string_lines(&self.content))
-                        as u32,
+                    font_size: ((self.height - 10.) / calc_string_lines(&self.content) as f64),
                     font_space: 0,
                     font_color: 0,
                 });

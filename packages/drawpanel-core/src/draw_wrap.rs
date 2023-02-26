@@ -65,7 +65,7 @@ impl Draw for DrawWrap<'_> {
             width: opts.width * scale,
             height: opts.height * scale,
             content: opts.content,
-            font_size: opts.font_size * (scale as u32),
+            font_size: opts.font_size * scale,
             font_space: opts.font_space * (scale as u32),
             font_color: opts.font_color,
         })
