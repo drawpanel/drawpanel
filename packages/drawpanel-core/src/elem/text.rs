@@ -23,6 +23,12 @@ impl Elem for Text {
 
         let drag_coords = self.get_vertex();
 
+        let mut font_size = (self.height) / calc_string_lines(&self.content) as f64;
+
+        if font_size < 1. {
+            (font_size = 1.);
+        }
+
         match status {
             Status::Default => {
                 draw.draw_text(DrawTextOpts {
@@ -30,7 +36,7 @@ impl Elem for Text {
                     width: self.width,
                     height: self.height,
                     content: &self.content,
-                    font_size: ((self.height - 10.) / calc_string_lines(&self.content) as f64),
+                    font_size,
                     font_space: 0,
                     font_color: 0,
                 });
@@ -50,7 +56,7 @@ impl Elem for Text {
                     width: self.width,
                     height: self.height,
                     content: &self.content,
-                    font_size: ((self.height - 10.) / calc_string_lines(&self.content) as f64),
+                    font_size,
                     font_space: 0,
                     font_color: 0,
                 });
@@ -103,7 +109,7 @@ impl Elem for Text {
                     width: self.width,
                     height: self.height,
                     content: &self.content,
-                    font_size: ((self.height - 10.) / calc_string_lines(&self.content) as f64),
+                    font_size,
                     font_space: 0,
                     font_color: 0,
                 });
@@ -156,7 +162,7 @@ impl Elem for Text {
                     width: self.width,
                     height: self.height,
                     content: &self.content,
-                    font_size: ((self.height - 10.) / calc_string_lines(&self.content) as f64),
+                    font_size,
                     font_space: 0,
                     font_color: 0,
                 });
