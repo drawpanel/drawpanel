@@ -1,8 +1,8 @@
 use std::{any::Any, borrow::Borrow, cell::RefCell, rc::Rc};
 
-use drawpanel_bind_egui::EguiBinder;
+use drawpanel_bind_egui::{EguiBinder, EguiHookEvent};
 use drawpanel_core::{
-    binder::{EventMouseButton, EventType, EventZoom},
+    binder::{EventMouseButton, EventRect, EventType, EventZoom},
     drawpanel::{Drawpanel, Mode},
 };
 use eframe::emath;
@@ -14,6 +14,7 @@ use geo::coord;
 // #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct TemplateApp {
     drawpanel: Drawpanel,
+    my_string: String,
 }
 
 impl TemplateApp {
@@ -30,6 +31,7 @@ impl TemplateApp {
         // }
         Self {
             drawpanel: Drawpanel::new(EguiBinder::new()),
+            my_string: "Hello World!".to_string(),
         }
     }
 }
@@ -59,6 +61,13 @@ impl eframe::App for TemplateApp {
                     }
                 });
                 ui.menu_button("Draw", |ui| {
+                    if ui.button("Pen").clicked() {
+                        self.drawpanel.set_mode(Mode::Creating(Some(Box::new(
+                            drawpanel_core::elem::pen::Pen::default(),
+                        ))));
+                        println!("Pen");
+                        ui.close_menu();
+                    }
                     if ui.button("Line").clicked() {
                         self.drawpanel.set_mode(Mode::Creating(Some(Box::new(
                             drawpanel_core::elem::line::Line::default(),
@@ -73,9 +82,28 @@ impl eframe::App for TemplateApp {
                         println!("Rect");
                         ui.close_menu();
                     }
+                    if ui.button("Text").clicked() {
+                        self.drawpanel.set_mode(Mode::Creating(Some(Box::new(
+                            drawpanel_core::elem::text::Text::default(),
+                        ))));
+                        println!("Text");
+                        ui.close_menu();
+                    }
                 });
             });
         });
+
+        // egui::Window::new("Drawpanel")
+        //     .open(&mut true)
+        //     .default_size(egui::vec2(512.0, 512.0))
+        //     .vscroll(false)
+        //     .title_bar(false)
+        //     .show(ctx, |ui| {
+        //         let response = ui.add(egui::TextEdit::singleline(&mut self.my_string));
+        //         if response.changed() {
+        //             println!("my_string: {:?}", self.my_string);
+        //         }
+        //     });
 
         egui::CentralPanel::default().show(&ctx, |ui| {
             Frame::canvas(ui.style()).show(ui, |ui| {
@@ -85,6 +113,12 @@ impl eframe::App for TemplateApp {
                 let panel = panel.upgrade();
                 let panel = panel.unwrap().clone();
                 let mut panel = panel.borrow_mut();
+
+                // panel.trigger_event2(
+                //     EventType::None,
+                //     coord! { x: 0.0, y: 0.0 },
+                //     Box::new(ui),
+                // );
 
                 if let Some(pointer_pos) = response.interact_pointer_pos() {
                     if response.dragged_by(PointerButton::Primary) {
@@ -108,7 +142,6 @@ impl eframe::App for TemplateApp {
                                 y: pointer_pos.y as f64
                             },
                         );
-                        println!("elems {:?}", panel.elems);
                     }
                 }
 
@@ -148,64 +181,56 @@ impl eframe::App for TemplateApp {
                         }
                     });
                 }
+
+                if response.double_clicked_by(PointerButton::Primary) {
+                    if let Some(pointer_pos) = response.hover_pos() {
+                        panel.trigger_event(
+                            EventType::Dblclick,
+                            coord! {
+                                x: pointer_pos.x as f64,
+                                y: pointer_pos.y as f64
+                            },
+                        );
+                    }
+                }
+
                 // 绘图
-                let shapes: Box<RefCell<Option<Vec<egui::Shape>>>> =
-                    panel.trigger_draw().downcast().unwrap();
+                let shapes: Box<RefCell<Option<Vec<egui::Shape>>>> = panel
+                    .trigger_draw2(Box::new(ctx.clone()))
+                    .downcast()
+                    .unwrap();
                 if let Some(shapes) = shapes.borrow_mut().as_mut() {
                     painter.extend(shapes.clone());
+                }
+
+                // 输入框处理
+                if let Some(hook_event) = panel.hook_event.as_mut() {
+                    let hook: EguiHookEvent = *hook_event.get_state().downcast().unwrap();
+                    if let Some(input_rect) = hook.input_rect {
+                        self.my_string = hook.input_text.unwrap();
+                        println!("input_rect: {:?}", input_rect);
+                        let input_box = ui.put(
+                            egui::Rect::from_min_size(
+                                egui::pos2(
+                                    (input_rect.coord.x) as f32,
+                                    (input_rect.coord.y) as f32,
+                                ),
+                                egui::vec2(input_rect.width as f32, input_rect.height as f32),
+                            ),
+                            egui::TextEdit::multiline(&mut self.my_string).desired_rows(1),
+                        );
+                        input_box.request_focus();
+
+                        hook_event.set_state(Box::new(EguiHookEvent {
+                            input_rect: Some(input_rect),
+                            input_text: Some(self.my_string.clone()),
+                        }));
+                    }
                 }
 
                 response
             });
         });
-        // egui::SidePanel::left("side_panel").show(ctx, |ui| {
-        //     ui.heading("Side Panel");
-
-        //     ui.horizontal(|ui| {
-        //         ui.label("Write something: ");
-        //         ui.text_edit_singleline(label);
-        //     });
-
-        //     ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
-        //     if ui.button("Increment").clicked() {
-        //         *value += 1.0;
-        //     }
-
-        //     ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-        //         ui.horizontal(|ui| {
-        //             ui.spacing_mut().item_spacing.x = 0.0;
-        //             ui.label("powered by ");
-        //             ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-        //             ui.label(" and ");
-        //             ui.hyperlink_to(
-        //                 "eframe",
-        //                 "https://github.com/emilk/egui/tree/master/crates/eframe",
-        //             );
-        //             ui.label(".");
-        //         });
-        //     });
-        // });
-
-        // egui::CentralPanel::default().show(ctx, |ui| {
-        //     // The central panel the region left after adding TopPanel's and SidePanel's
-
-        //     ui.heading("eframe template");
-        //     ui.hyperlink("https://github.com/emilk/eframe_template");
-        //     ui.add(egui::github_link_file!(
-        //         "https://github.com/emilk/eframe_template/blob/master/",
-        //         "Source code."
-        //     ));
-        //     egui::warn_if_debug_build(ui);
-        // });
-
-        // if true {
-        //     egui::Window::new("Window").show(ctx, |ui| {
-        //         ui.label("Windows can be moved by dragging them.");
-        //         ui.label("They are automatically sized based on contents.");
-        //         ui.label("You can turn on resizing and scrolling if you like.");
-        //         ui.label("You would normally choose either panels OR windows.");
-        //     });
-        // }
     }
 }
 

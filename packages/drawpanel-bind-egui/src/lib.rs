@@ -7,7 +7,7 @@ use drawpanel_core::{
         EventType, EventZoom, HookEvent, IDraw, IHookEvent,
     },
     drawpanel::Drawpanel,
-    elem::{Elem, IElem},
+    elem::{rect::Rect, Elem, IElem},
     panel::Panel,
 };
 use egui::{Frame, PointerButton, Pos2, Sense};
@@ -28,12 +28,12 @@ impl Binder for EguiBinder {
     fn draw(&self, panel: Weak<RefCell<Panel>>) -> Box<dyn IDraw> {
         Box::new(EguiDraw {
             shapes: RefCell::new(None),
-            panel: panel,
+            egui_ctx: RefCell::new(None),
         })
     }
 
     fn hook_event(&self) -> Box<dyn IHookEvent> {
-        Box::new(EguiHookEvent { flush: false })
+        Box::new(EguiHookEvent::default())
     }
 
     fn region(&self) -> geo::Rect<f64> {
@@ -44,22 +44,25 @@ impl Binder for EguiBinder {
 #[derive(Debug)]
 struct EguiDraw {
     shapes: RefCell<Option<Vec<egui::Shape>>>,
-    panel: Weak<RefCell<Panel>>,
+    egui_ctx: RefCell<Option<egui::Context>>,
 }
 
 impl IDraw for EguiDraw {}
 
 impl Draw for EguiDraw {
-    fn draw_begin(&self) {
+    fn draw_begin(&self, ctx: Box<dyn std::any::Any>) {
         let mut shapes = self.shapes.borrow_mut();
         *shapes = Some(Vec::new());
-        // println!("[DEBUG] draw_begin {:?}", self.shapes);
+        let ctx: Result<Box<egui::Context>, _> = ctx.downcast();
+        if let Ok(ctx) = ctx {
+            let mut egui_ctx = self.egui_ctx.borrow_mut();
+            *egui_ctx = Some(*ctx);
+        }
     }
     fn draw_line(&self, opts: DrawLineOpts) {
         let mut shapes = self.shapes.borrow_mut();
 
         if let Some(shapes) = shapes.as_mut() {
-            println!("draw_line {:?}", opts.line_size);
             shapes.push(egui::Shape::line(
                 vec![
                     Pos2::new(opts.from_coord.x as f32, opts.from_coord.y as f32),
@@ -98,37 +101,70 @@ impl Draw for EguiDraw {
         }
     }
 
-    fn draw_text(&self, opts: drawpanel_core::binder::DrawTextOpts) {}
+    fn draw_text(&self, opts: drawpanel_core::binder::DrawTextOpts) {
+        let mut shapes = self.shapes.borrow_mut();
 
-    // fn update(&mut self, ctx: Box<dyn std::any::Any>) {
-    //     // let shapes = self.shapes.clone();
-    //     // let mut shapes = shapes.borrow_mut();
-    //     // println!("UPDATE {:?}", shapes);
+        if let Some(shapes) = shapes.as_mut() {
+            let binding = self.egui_ctx.borrow();
+            let fonts = binding.as_ref().unwrap().fonts();
+            shapes.push(egui::Shape::text(
+                &fonts,
+                egui::pos2(
+                    (opts.left_top_coord.x + opts.width / 2.) as f32,
+                    (opts.left_top_coord.y + opts.height / 2.) as f32,
+                ),
+                egui::Align2::CENTER_CENTER,
+                opts.content,
+                egui::FontId::new(opts.font_size as f32, egui::FontFamily::default()),
+                egui::Color32::RED,
+            ));
+        }
+    }
 
-    //     // shapes.push(egui::Shape::line(
-    //     //     vec![Pos2::new(0 as f32, 0 as f32), Pos2::new(1 as f32, 1 as f32)],
-    //     //     egui::Stroke::new(1 as f32, egui::Color32::RED),
-    //     // ));
-    // }
     fn draw_end(&self) -> Box<dyn std::any::Any> {
         // println!("[DEBUG] draw_end");
         return Box::new(self.shapes.clone());
     }
 }
 
-#[derive(Debug)]
-struct EguiHookEvent {
-    flush: bool,
+#[derive(Debug, Clone, Default)]
+pub struct EguiHookEvent {
+    pub input_rect: Option<EventRect>,
+    pub input_text: Option<String>,
 }
+
+impl EguiHookEvent {}
 
 impl IHookEvent for EguiHookEvent {}
 
 impl HookEvent for EguiHookEvent {
-    fn begin_edit_state(&mut self, elem: &mut Box<dyn IElem>, event_rect: EventRect) {}
+    fn begin_edit_state(&mut self, elem: &mut Box<dyn IElem>, event_rect: EventRect) {
+        println!("[DEBUG] begin_edit_state");
+        if elem.need_input() {
+            self.input_rect = Some(event_rect);
+            self.input_text = Some(elem.get_content().to_owned());
+            elem.set_content("");
+        }
+    }
 
-    fn end_edit_state(&mut self, elem: &mut Box<dyn IElem>, mouse_coord: Coordinate) {}
+    fn end_edit_state(&mut self, elem: &mut Box<dyn IElem>, mouse_coord: Coordinate) {
+        println!("[DEBUG] end_edit_state");
+        if elem.need_input() {
+            elem.set_content(&self.input_text.as_ref().unwrap().to_owned());
+            self.input_rect = None;
+            self.input_text = None;
+        }
+    }
 
-    fn flush(&mut self) {
-        self.flush = true;
+    fn flush(&mut self) {}
+
+    fn get_state(&self) -> Box<dyn std::any::Any> {
+        Box::new(self.clone())
+    }
+
+    fn set_state(&mut self, state: Box<dyn std::any::Any>) {
+        if let Ok(state) = state.downcast::<Self>() {
+            *self = *state;
+        }
     }
 }
