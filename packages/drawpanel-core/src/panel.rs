@@ -97,8 +97,12 @@ impl Panel {
     }
 
     pub fn trigger_draw(&self) -> Box<dyn std::any::Any> {
+        return self.trigger_draw2(Box::new(()));
+    }
+
+    pub fn trigger_draw2(&self, ctx: Box<dyn std::any::Any>) -> Box<dyn std::any::Any> {
         let draw = &self.draw.as_ref().unwrap();
-        draw.draw_begin();
+        draw.draw_begin(ctx);
         draw.draw_rect(DrawRectOpts {
             left_top_coord: self.lt_coord,
             width: self.width * self.scale,

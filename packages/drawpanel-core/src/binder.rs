@@ -79,7 +79,7 @@ pub trait Binder {
 pub trait IDraw: Draw + Debug {}
 
 pub trait Draw {
-    fn draw_begin(&self) {}
+    fn draw_begin(&self, ctx: Box<dyn std::any::Any>) {}
     fn draw_line(&self, opts: DrawLineOpts);
     fn draw_rect(&self, opts: DrawRectOpts);
     fn draw_circle(&self, opts: DrawCircleOpts);
