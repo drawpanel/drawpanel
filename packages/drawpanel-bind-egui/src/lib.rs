@@ -26,10 +26,7 @@ impl Binder for EguiBinder {
     fn init(&mut self, panel: Weak<RefCell<Panel>>) {}
 
     fn draw(&self, panel: Weak<RefCell<Panel>>) -> Box<dyn IDraw> {
-        Box::new(EguiDraw {
-            shapes: RefCell::new(None),
-            egui_ctx: RefCell::new(None),
-        })
+        Box::new(EguiDraw::default())
     }
 
     fn hook_event(&self) -> Box<dyn IHookEvent> {
@@ -41,7 +38,7 @@ impl Binder for EguiBinder {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 struct EguiDraw {
     shapes: RefCell<Option<Vec<egui::Shape>>>,
     egui_ctx: RefCell<Option<egui::Context>>,
